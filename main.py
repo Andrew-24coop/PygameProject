@@ -30,7 +30,6 @@ class Biome:
         return world
 
     def get_biome(self, value):
-        print(value)
         if value < -0.05:
             return 'water'
         elif value < 0:
