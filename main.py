@@ -37,7 +37,7 @@ def generate_map(width, height, seed):
 def get_terrain_color(height_value):
     if height_value < -0.1:
         return COLORS["ocean"]
-    elif height_value < 0.0:
+    elif height_value < 0.01:
         return COLORS["sand"]
     elif height_value < 0.2:
         return COLORS["grass"]
@@ -54,7 +54,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Запросите у пользователя семя
-    seed = random.randint(0, 100)
+    seed = random.randint(0, 255)
 
     world_map = generate_map(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, seed)
 
