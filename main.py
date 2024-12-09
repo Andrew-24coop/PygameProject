@@ -1,63 +1,62 @@
+import random
+
 import pygame
 import numpy as np
-import random
-from noise import pnoise2
+import noise
 
-WIDTH, HEIGHT = 800, 600
-TILE_SIZE = 10
-WORLD_WIDTH = WIDTH // TILE_SIZE
-WORLD_HEIGHT = HEIGHT // TILE_SIZE
+# Настройки Pygame
+WIDTH, HEIGHT = 1000, 600
+TILE_SIZE = 1  # Размер одной "плитки" (пикселя)
 
-TERRAIN_COLORS = {
-    "water": (0, 0, 255),
-    "sand": (255, 255, 100),
-    "grass": (0, 255, 0),
+# Цвета для отображения различных типов местности
+COLORS = {
+    "ocean": (0, 0, 255),
+    "sand": (194, 178, 128),
+    "grass": (34, 139, 34),
     "forest": (0, 100, 0),
-    "mountain": (139, 137, 137),
+    "mountain": (139, 137, 137)
 }
 
+# Функция генерации карты с использованием семени
+def generate_map(width, height, seed):
+    world_map = np.zeros((height, width))
+    scale = 100.0  # Масштаб перлин шума
+    for x in range(width):
+        for y in range(height):
+            world_map[y][x] = noise.pnoise2(x / scale,
+                                            y / scale,
+                                            octaves=6,
+                                            persistence=0.5,
+                                            lacunarity=2.0,
+                                            repeatx=1024,
+                                            repeaty=1024,
+                                            base=seed)  # Используем семя
+    return world_map
 
-class Biome:
-    def __init__(self, seed):
-        self.world = self.generate_world(seed)
+# Функция определения типа местности по высоте
+def get_terrain_color(height_value):
+    if height_value < -0.1:
+        return COLORS["ocean"]
+    elif height_value < 0.0:
+        return COLORS["sand"]
+    elif height_value < 0.2:
+        return COLORS["grass"]
+    elif height_value < 0.4:
+        return COLORS["forest"]
+    else:
+        return COLORS["mountain"]
 
-    def generate_world(self, seed):
-        world = np.zeros((WORLD_HEIGHT, WORLD_WIDTH))
-        for y in range(WORLD_HEIGHT):
-            for x in range(WORLD_WIDTH):
-                noise_value = pnoise2((x + seed) / 20, (y + seed) / 20, octaves=6)
-                world[y][x] = noise_value
-        return world
-
-    def get_biome(self, value):
-        if value < -0.05:
-            return 'water'
-        elif value < 0:
-            return 'sand'
-        elif value < 0.3:
-            return 'grass'
-        elif value < 0.5:
-            return 'forest'
-        else:
-            return 'mountain'
-
-    def draw(self, screen):
-        for y in range(WORLD_HEIGHT):
-            for x in range(WORLD_WIDTH):
-                value = self.world[y][x]
-                biome = self.get_biome(value)
-                color = TERRAIN_COLORS[biome]
-                pygame.draw.rect(screen, color, (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-
-
+# Основная функция игры
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("World Generation with Biomes")
+    pygame.display.set_caption("Realistic World Generation")
     clock = pygame.time.Clock()
 
-    seed = random.randint(0, 10000)
-    biome = Biome(seed)
+    # Запросите у пользователя семя
+    seed = random.randint(0, 100)
+
+    world_map = generate_map(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, seed)
 
     running = True
     while running:
@@ -65,13 +64,17 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.fill((0, 0, 0))
-        biome.draw(screen)
+        # Отрисовка карты
+        for y in range(HEIGHT // TILE_SIZE):
+            for x in range(WIDTH // TILE_SIZE):
+                height_value = world_map[y][x]
+                color = get_terrain_color(height_value)
+                pygame.draw.rect(screen, color, (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+
         pygame.display.flip()
         clock.tick(60)
 
     pygame.quit()
-
 
 if __name__ == "__main__":
     main()
