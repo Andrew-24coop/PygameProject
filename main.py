@@ -28,7 +28,7 @@ def generate_map(width, height, seed):
                                             lacunarity=2.0,
                                             repeatx=1024,
                                             repeaty=1024,
-                                            base=seed)  # Используем семя
+                                            base=seed)
     return world_map
 
 
@@ -37,9 +37,9 @@ def get_terrain_color(height_value):
         return COLORS["ocean"]
     elif height_value < 0.01:
         return COLORS["sand"]
-    elif height_value < 0.2:
+    elif height_value < 0.15:
         return COLORS["grass"]
-    elif height_value < 0.4:
+    elif height_value < 0.35:
         return COLORS["forest"]
     else:
         return COLORS["mountain"]
