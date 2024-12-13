@@ -12,18 +12,21 @@ class World:
         self.world_map = self.generate_map()
 
     def generate_map(self):
-        world_map = np.zeros((self.height, self.width))
+        # Create a 1D numpy array to hold the height values
+        world_map = np.zeros(self.width * self.height)
         scale = 100.0
         for x in range(self.width):
             for y in range(self.height):
-                world_map[y][x] = noise.pnoise2(x / scale,
-                                                y / scale,
-                                                octaves=6,
-                                                persistence=0.5,
-                                                lacunarity=2.0,
-                                                repeatx=1024,
-                                                repeaty=1024,
-                                                base=self.seed)
+                # Calculate the index in the 1D array
+                index = y * self.width + x
+                world_map[index] = noise.pnoise2(x / scale,
+                                                 y / scale,
+                                                 octaves=6,
+                                                 persistence=0.5,
+                                                 lacunarity=2.0,
+                                                 repeatx=1024,
+                                                 repeaty=1024,
+                                                 base=self.seed)
         return world_map
 
     def get_terrain_color(self, height_value):
@@ -41,6 +44,7 @@ class World:
     def draw(self, screen):
         for y in range(self.height):
             for x in range(self.width):
-                height_value = self.world_map[y][x]
+                index = y * self.width + x
+                height_value = self.world_map[index]
                 color = self.get_terrain_color(height_value)
                 pygame.draw.rect(screen, color, (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
