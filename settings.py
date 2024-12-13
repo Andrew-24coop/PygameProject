@@ -3,6 +3,7 @@ import random
 WIDTH, HEIGHT = 1000, 600
 SIZE = (WIDTH, HEIGHT)
 TILE_SIZE = 1
+CHUNK_SIZE = 50
 
 FPS = 30
 SEED = random.randint(0, 255)

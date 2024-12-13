@@ -12,22 +12,32 @@ def main():
 
     world = World(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, SEED)
 
+    world.draw(screen)
+
+    for x in range(0, WIDTH, CHUNK_SIZE):
+        pygame.draw.line(screen, (255, 255, 255), (x, 0), (x, HEIGHT))
+    for y in range(0, HEIGHT, CHUNK_SIZE):
+        pygame.draw.line(screen, (255, 255, 255), (0, y), (WIDTH, y))
+
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.fill((0, 0, 0))
-        world.draw(screen)
-
-        for x in range(0, WIDTH, 50):
+        for x in range(0, WIDTH, CHUNK_SIZE):
             pygame.draw.line(screen, (255, 255, 255), (x, 0), (x, HEIGHT))
-        for y in range(0, HEIGHT, 50):
+        for y in range(0, HEIGHT, CHUNK_SIZE):
             pygame.draw.line(screen, (255, 255, 255), (0, y), (WIDTH, y))
 
-        pygame.display.flip()
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_x = (mouse_pos[0] // CHUNK_SIZE) * CHUNK_SIZE
+        mouse_y = (mouse_pos[1] // CHUNK_SIZE) * CHUNK_SIZE
+
+        pygame.draw.rect(screen, (255, 0, 0, 10), (mouse_x + 1, mouse_y + 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1))
+
         clock.tick(FPS)
+        pygame.display.flip()
 
     pygame.quit()
 
