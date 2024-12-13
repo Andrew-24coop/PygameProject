@@ -1,5 +1,11 @@
+import random
+
 WIDTH, HEIGHT = 1000, 600
+SIZE = (WIDTH, HEIGHT)
 TILE_SIZE = 1
+
+FPS = 30
+SEED = random.randint(0, 255)
 
 COLORS = {
     "ocean": (0, 0, 255),

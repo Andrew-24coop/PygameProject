@@ -6,12 +6,11 @@ from settings import *
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Realistic World Generation")
+    pygame.display.set_caption("Rise of Empire")
+    screen = pygame.display.set_mode(SIZE)
     clock = pygame.time.Clock()
 
-    seed = random.randint(0, 255)
-    world = World(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, seed)
+    world = World(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, SEED)
 
     running = True
     while running:
@@ -28,7 +27,7 @@ def main():
             pygame.draw.line(screen, (255, 255, 255), (0, y), (WIDTH, y))
 
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(FPS)
 
     pygame.quit()
 
