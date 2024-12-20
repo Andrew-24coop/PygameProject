@@ -29,7 +29,7 @@ def main():
         mouse_pos = pygame.mouse.get_pos()
         mouse_x = (mouse_pos[0] // CHUNK_SIZE) * CHUNK_SIZE
         mouse_y = (mouse_pos[1] // CHUNK_SIZE) * CHUNK_SIZE
-
+        # world.draw(screen)
         # pygame.draw.rect(screen, (255, 0, 0, 10), (mouse_x + 1, mouse_y + 1, CHUNK_SIZE - 1, CHUNK_SIZE - 1))
 
         for x in range(0, WIDTH, CHUNK_SIZE):
