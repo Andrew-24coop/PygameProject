@@ -29,23 +29,23 @@ class Main_hero(pygame.sprite.Sprite):
 
         self.fast_moving = False
 
-        self.right_moving_pictures = ['Main_hero_sprites/sprite_4.png', 'Main_hero_sprites/sprite_8.png',
-                                      'Main_hero_sprites/sprite_10.png']
-        self.left_moving_pictures = ['Main_hero_sprites/sprite_2.png', 'Main_hero_sprites/sprite_7.png',
-                                     'Main_hero_sprites/sprite_9.png']
-        self.up_moving_pictures = ['Main_hero_sprites/sprite_3.png', 'Main_hero_sprites/sprite_11.png',
-                                   'Main_hero_sprites/sprite_12.png']
-        self.down_moving_pictures = ['Main_hero_sprites/main_sprite.png', 'Main_hero_sprites/sprite_6.png',
-                                     'Main_hero_sprites/sprite_5.png']
-        self.down_stop_pictures = ['Main_hero_sprites/main_sprite.png', 'Main_hero_sprites/sprite_13.png',
-                                   'Main_hero_sprites/sprite_14.png', 'Main_hero_sprites/sprite_13.png',
-                                   'Main_hero_sprites/main_sprite.png']
-        self.left_stop_pictures = ['Main_hero_sprites/sprite_2.png', 'Main_hero_sprites/sprite_15.png',
-                                   'Main_hero_sprites/sprite_16.png', 'Main_hero_sprites/sprite_15.png',
-                                   'Main_hero_sprites/sprite_2.png']
-        self.right_stop_pictures = ['Main_hero_sprites/sprite_4.png', 'Main_hero_sprites/sprite_17.png',
-                                    'Main_hero_sprites/sprite_18.png', 'Main_hero_sprites/sprite_17.png',
-                                    'Main_hero_sprites/sprite_4.png']
+        self.right_moving_pictures = ['img/Main_hero_sprites/sprite_4.png', 'img/Main_hero_sprites/sprite_8.png',
+                                      'img/Main_hero_sprites/sprite_10.png']
+        self.left_moving_pictures = ['img/Main_hero_sprites/sprite_2.png', 'img/Main_hero_sprites/sprite_7.png',
+                                     'img/Main_hero_sprites/sprite_9.png']
+        self.up_moving_pictures = ['img/Main_hero_sprites/sprite_3.png', 'img/Main_hero_sprites/sprite_11.png',
+                                   'img/Main_hero_sprites/sprite_12.png']
+        self.down_moving_pictures = ['img/Main_hero_sprites/main_sprite.png', 'img/Main_hero_sprites/sprite_6.png',
+                                     'img/Main_hero_sprites/sprite_5.png']
+        self.down_stop_pictures = ['img/Main_hero_sprites/main_sprite.png', 'img/Main_hero_sprites/sprite_13.png',
+                                   'img/Main_hero_sprites/sprite_14.png', 'img/Main_hero_sprites/sprite_13.png',
+                                   'img/Main_hero_sprites/main_sprite.png']
+        self.left_stop_pictures = ['img/Main_hero_sprites/sprite_2.png', 'img/Main_hero_sprites/sprite_15.png',
+                                   'img/Main_hero_sprites/sprite_16.png', 'img/Main_hero_sprites/sprite_15.png',
+                                   'img/Main_hero_sprites/sprite_2.png']
+        self.right_stop_pictures = ['img/Main_hero_sprites/sprite_4.png', 'img/Main_hero_sprites/sprite_17.png',
+                                    'img/Main_hero_sprites/sprite_18.png', 'img/Main_hero_sprites/sprite_17.png',
+                                    'img/Main_hero_sprites/sprite_4.png']
 
 
     def movement(self, *args):
