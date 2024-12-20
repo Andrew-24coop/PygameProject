@@ -20,6 +20,8 @@ class Main_hero(pygame.sprite.Sprite):
         self.moving_frame = 0
         self.stop_frame = 0
 
+        self.blink = 0
+
         self.move_right = False
         self.move_left = False
         self.move_up = False
@@ -79,6 +81,8 @@ class Main_hero(pygame.sprite.Sprite):
         if self.fast_moving:
             coefficient = 0.3
         if self.is_move:
+            self.blink = 0
+            self.stop_frame = 0
             self.moving_frame += coefficient
             if self.moving_frame > 3:
                 self.moving_frame = 0
@@ -91,17 +95,22 @@ class Main_hero(pygame.sprite.Sprite):
             elif self.move_down:
                 self.image = pygame.image.load(self.down_moving_pictures[int(self.moving_frame)]).convert_alpha()
         else:
+            self.blink += 0.1
             self.stop_frame += low_coefficient
             if self.stop_frame > 5:
                 self.stop_frame = 0
-            if self.move_right:
-                self.image = pygame.image.load(self.right_stop_pictures[int(self.stop_frame)]).convert_alpha()
-            elif self.move_left:
-                self.image = pygame.image.load(self.left_stop_pictures[int(self.stop_frame)]).convert_alpha()
-            elif self.move_up:
-                self.image = pygame.image.load(self.up_moving_pictures[0]).convert_alpha()
-            elif self.move_down:
-                self.image = pygame.image.load(self.down_stop_pictures[int(self.stop_frame)]).convert_alpha()
+            if self.blink > 5 and self.blink < 7 or self.blink == 0.1:
+                if self.move_right:
+                    self.image = pygame.image.load(self.right_stop_pictures[int(self.stop_frame)]).convert_alpha()
+                elif self.move_left:
+                    self.image = pygame.image.load(self.left_stop_pictures[int(self.stop_frame)]).convert_alpha()
+                elif self.move_up:
+                    self.image = pygame.image.load(self.up_moving_pictures[0]).convert_alpha()
+                elif self.move_down:
+                    self.image = pygame.image.load(self.down_stop_pictures[int(self.stop_frame)]).convert_alpha()
+            elif self.blink > 7:
+                self.stop_frame = 0
+                self.blink = 0
             self.moving_frame = 2
 
     def make_right_true(self):
