@@ -1,5 +1,4 @@
 import pygame
-
 class Main_hero(pygame.sprite.Sprite):
     def __init__(self, file, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -17,7 +16,9 @@ class Main_hero(pygame.sprite.Sprite):
         # self.is_on_ground = False
 
         self.is_move = False
-        self.frame = 0
+
+        self.moving_frame = 0
+        self.stop_frame = 0
 
         self.move_right = False
         self.move_left = False
@@ -34,11 +35,23 @@ class Main_hero(pygame.sprite.Sprite):
                                    'Main_hero_sprites/sprite_12.png']
         self.down_moving_pictures = ['Main_hero_sprites/main_sprite.png', 'Main_hero_sprites/sprite_6.png',
                                      'Main_hero_sprites/sprite_5.png']
+        self.down_stop_pictures = ['Main_hero_sprites/main_sprite.png', 'Main_hero_sprites/sprite_13.png',
+                                   'Main_hero_sprites/sprite_14.png', 'Main_hero_sprites/sprite_13.png',
+                                   'Main_hero_sprites/main_sprite.png']
+        self.left_stop_pictures = ['Main_hero_sprites/sprite_2.png', 'Main_hero_sprites/sprite_15.png',
+                                   'Main_hero_sprites/sprite_16.png', 'Main_hero_sprites/sprite_15.png',
+                                   'Main_hero_sprites/sprite_2.png']
+        self.right_stop_pictures = ['Main_hero_sprites/sprite_4.png', 'Main_hero_sprites/sprite_17.png',
+                                    'Main_hero_sprites/sprite_18.png', 'Main_hero_sprites/sprite_17.png',
+                                    'Main_hero_sprites/sprite_4.png']
+
 
     def movement(self, *args):
-        if self.fast_moving:
-            self.pos_x = self.pos_x * 2
-            self.pos_y = self.pos_y * 2
+        if self.fast_moving and self.is_move:
+            if self.move_right or self.move_left:
+                self.pos_x = self.pos_x * 1.5
+            elif self.move_up or self.move_down:
+                self.pos_y = self.pos_y * 1.5
         self.rect.x += self.pos_x
         self.rect.y += self.pos_y
 
@@ -62,85 +75,99 @@ class Main_hero(pygame.sprite.Sprite):
 
     def put_sprites(self):
         coefficient = 0.2
+        low_coefficient = 0.3
         if self.fast_moving:
             coefficient = 0.3
         if self.is_move:
-            self.frame += coefficient
-            if self.frame > 3:
-                self.frame = 0
-
+            self.moving_frame += coefficient
+            if self.moving_frame > 3:
+                self.moving_frame = 0
             if self.move_right:
-                self.image = pygame.image.load(self.right_moving_pictures[int(self.frame)]).convert_alpha()
+                self.image = pygame.image.load(self.right_moving_pictures[int(self.moving_frame)]).convert_alpha()
             elif self.move_left:
-                self.image = pygame.image.load(self.left_moving_pictures[int(self.frame)]).convert_alpha()
+                self.image = pygame.image.load(self.left_moving_pictures[int(self.moving_frame)]).convert_alpha()
             elif self.move_up:
-                self.image = pygame.image.load(self.up_moving_pictures[int(self.frame)]).convert_alpha()
+                self.image = pygame.image.load(self.up_moving_pictures[int(self.moving_frame)]).convert_alpha()
             elif self.move_down:
-                self.image = pygame.image.load(self.down_moving_pictures[int(self.frame)]).convert_alpha()
+                self.image = pygame.image.load(self.down_moving_pictures[int(self.moving_frame)]).convert_alpha()
         else:
+            self.stop_frame += low_coefficient
+            if self.stop_frame > 5:
+                self.stop_frame = 0
             if self.move_right:
-                self.image = pygame.image.load(self.right_moving_pictures[0]).convert_alpha()
+                self.image = pygame.image.load(self.right_stop_pictures[int(self.stop_frame)]).convert_alpha()
             elif self.move_left:
-                self.image = pygame.image.load(self.left_moving_pictures[0]).convert_alpha()
+                self.image = pygame.image.load(self.left_stop_pictures[int(self.stop_frame)]).convert_alpha()
             elif self.move_up:
                 self.image = pygame.image.load(self.up_moving_pictures[0]).convert_alpha()
             elif self.move_down:
-                self.image = pygame.image.load(self.down_moving_pictures[0]).convert_alpha()
-            self.frame = 2
+                self.image = pygame.image.load(self.down_stop_pictures[int(self.stop_frame)]).convert_alpha()
+            self.moving_frame = 2
 
+    def make_right_true(self):
+        self.pos_x = 5
+        self.is_move = True
 
-def move():
-    key = pygame.key.get_pressed()
+        self.move_right = True
+        self.move_left = False
+        self.move_up = False
+        self.move_down = False
 
-    if key[pygame.K_d]:
-        player.pos_x = 5
-        player.is_move = True
+    def make_left_true(self):
+        self.pos_x = -5
+        self.is_move = True
 
-        player.move_right = True
-        player.move_left = False
-        player.move_up = False
-        player.move_down = False
+        self.move_right = False
+        self.move_left = True
+        self.move_up = False
+        self.move_down = False
 
-    if key[pygame.K_a]:
-        player.pos_x = -5
-        player.is_move = True
+    def make_up_true(self):
+        self.pos_y = -5
+        self.is_move = True
 
-        player.move_right = False
-        player.move_left = True
-        player.move_up = False
-        player.move_down = False
+        self.move_right = False
+        self.move_left = False
+        self.move_up = True
+        self.move_down = False
 
-    if key[pygame.K_w]:
-        player.pos_y = -5
+    def make_down_true(self):
+        self.pos_y = 5
+        self.is_move = True
 
-        player.is_move = True
+        self.move_right = False
+        self.move_left = False
+        self.move_up = False
+        self.move_down = True
 
-        player.move_right = False
-        player.move_left = False
-        player.move_up = True
-        player.move_down = False
+    def make_fast_moving(self):
+        self.fast_moving = True
 
-    if key[pygame.K_s]:
-        player.pos_y = 5
+    def check_keyboard(self):
+        key = pygame.key.get_pressed()
 
-        player.is_move = True
+        if key[pygame.K_d]:
+            self.make_right_true()
 
-        player.move_right = False
-        player.move_left = False
-        player.move_up = False
-        player.move_down = True
+        if key[pygame.K_a]:
+            self.make_left_true()
 
-    if key[pygame.K_LCTRL]:
-        player.fast_moving = True
-    # Для прыжков
-    # if key[pygame.K_SPACE]:
-    #     if player.is_on_ground:
-    #         player.jump = -20
-    #
-    #         player.is_on_ground = False
-    # player.movement(height - player.rect.height)
-    player.movement()
+        if key[pygame.K_w]:
+            self.make_up_true()
 
+        if key[pygame.K_s]:
+            self.make_down_true()
+
+        if key[pygame.K_LCTRL]:
+            self.make_fast_moving()
+        # Для прыжков
+        # if key[pygame.K_SPACE]:
+        #     if player.is_on_ground:
+        #         player.jump = -20
+        #
+        #         player.is_on_ground = False
+        # player.movement(height - player.rect.height)
+        self.movement()
 
 if __name__ == '__main__':
     pygame.init()
@@ -157,7 +184,7 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYUP:
                 player.is_move = False
                 player.frame = 2
-        move()
+        player.check_keyboard()
         screen.blit(player.image, player.rect)
         pygame.display.flip()
         clock.tick(30)
