@@ -184,7 +184,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     running = True
     clock = pygame.time.Clock()
-    player = Main_hero('Main_hero_sprites/main_sprite.png', 100, 400)
+    player = Main_hero('img/Main_hero_sprites/main_sprite.png', 100, 400)
     while running:
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
