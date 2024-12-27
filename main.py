@@ -6,9 +6,9 @@ import pygame
 
 def draw_grid(screen):
     for x in range(0, WIDTH, CHUNK_SIZE):
-        pygame.draw.line(screen, (200, 200, 200), (x, 0), (x, HEIGHT))  # Vertical lines
+        pygame.draw.line(screen, (200, 200, 200), (x, 0), (x, HEIGHT))
     for y in range(0, HEIGHT, CHUNK_SIZE):
-        pygame.draw.line(screen, (200, 200, 200), (0, y), (WIDTH, y))  # Horizontal lines
+        pygame.draw.line(screen, (200, 200, 200), (0, y), (WIDTH, y))
 
 
 def main():
@@ -18,14 +18,12 @@ def main():
     clock = pygame.time.Clock()
 
     world = World(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, SEED)
-
-    # Draw the entire map and grid at the start
     for chunk_row in world.chunks_array:
         for chunk in chunk_row:
             cx, cy = chunk
             world.draw_chunk(screen, cx, cy)
     draw_grid(screen)
-    pygame.display.flip()  # Ensure the initial map is displayed
+    pygame.display.flip()
 
     prev_chunk = None
 
@@ -41,17 +39,10 @@ def main():
         current_chunk = (chunk_x, chunk_y)
 
         if current_chunk != prev_chunk:
-            # Redraw the previous chunk
             if prev_chunk:
                 world.draw_chunk(screen, prev_chunk[0], prev_chunk[1])
-
-            # Redraw the current chunk with a highlight
             world.draw_chunk(screen, chunk_x, chunk_y, highlight=True)
-
-            # Redraw the grid to ensure it is on top
             draw_grid(screen)
-
-            # Update the previous chunk to the current one
             prev_chunk = current_chunk
 
         clock.tick(FPS)
