@@ -48,7 +48,7 @@ def main():
             # Redraw the current chunk with a highlight
             world.draw_chunk(screen, chunk_x, chunk_y, highlight=True)
 
-            # Redraw the grid to ensure it's on top
+            # Redraw the grid to ensure it is on top
             draw_grid(screen)
 
             # Update the previous chunk to the current one
