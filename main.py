@@ -5,6 +5,7 @@ import pygame
 
 
 def draw_grid(screen):
+    """Draw grid lines across the map."""
     for x in range(0, WIDTH, CHUNK_SIZE):
         pygame.draw.line(screen, (200, 200, 200), (x, 0), (x, HEIGHT))  # Vertical lines
     for y in range(0, HEIGHT, CHUNK_SIZE):
