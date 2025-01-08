@@ -5,9 +5,11 @@ import pygame
 
 def draw_grid(screen, zoom=1, offset=(0, 0)):
     grid_size = CHUNK_SIZE * TILE_SIZE * zoom
-    for x in range(-offset[0], WIDTH, grid_size):
+    start_x = -offset[0] % grid_size
+    start_y = -offset[1] % grid_size
+    for x in range(start_x, WIDTH, grid_size):
         pygame.draw.line(screen, (200, 200, 200), (x, 0), (x, HEIGHT))
-    for y in range(-offset[1], HEIGHT, grid_size):
+    for y in range(start_y, HEIGHT, grid_size):
         pygame.draw.line(screen, (200, 200, 200), (0, y), (WIDTH, y))
 
 
@@ -35,21 +37,23 @@ def main():
         else:
             chunk_x, chunk_y = zoom_chunk
             start_x = max(0, chunk_x - CHUNK_SIZE)
-            end_x = min(world.width, chunk_x + 2 * CHUNK_SIZE)
-            start_y = max(0, chunk_y)
-            end_y = min(world.height, chunk_y + CHUNK_SIZE)
+            end_x = min(world.width, chunk_x + CHUNK_SIZE * 2)
+            start_y = max(0, chunk_y - CHUNK_SIZE)
+            end_y = min(world.height, chunk_y + CHUNK_SIZE * 2)
 
             for x in range(start_x, end_x):
                 for y in range(start_y, end_y):
                     if 0 <= x < world.width and 0 <= y < world.height:
                         height_value = world.world_map[y, x]
                         color = world.get_terrain_color(height_value)
+                        screen_x = (x * TILE_SIZE * zoom - offset[0])
+                        screen_y = (y * TILE_SIZE * zoom - offset[1])
                         pygame.draw.rect(
                             screen,
                             color,
                             (
-                                (x - start_x) * TILE_SIZE * zoom - offset[0],
-                                (y - start_y) * TILE_SIZE * zoom - offset[1],
+                                screen_x,
+                                screen_y,
                                 TILE_SIZE * zoom,
                                 TILE_SIZE * zoom,
                             ),
@@ -80,15 +84,22 @@ def main():
                         chunk_y = (mouse_pos[1] // (CHUNK_SIZE * TILE_SIZE)) * CHUNK_SIZE
                         zoom_chunk = (chunk_x, chunk_y)
                         zoom = HEIGHT // (CHUNK_SIZE * TILE_SIZE)
-                        center_offset_x = WIDTH // 2 - CHUNK_SIZE * TILE_SIZE * zoom // 2
-                        offset = (center_offset_x, 0)
+
+                        # Center the selected chunk
+                        center_x = chunk_x * TILE_SIZE + (CHUNK_SIZE * TILE_SIZE) // 2
+                        center_y = chunk_y * TILE_SIZE + (CHUNK_SIZE * TILE_SIZE) // 2
+                        offset = (
+                            center_x * zoom - WIDTH // 2,
+                            center_y * zoom - HEIGHT // 2,
+                        )
+
                         prev_chunk = None
                         draw_world()
                         pygame.display.flip()
             elif event.type == pygame.MOUSEMOTION:
                 if pygame.mouse.get_pressed()[0] and zoom > 1:
                     dx, dy = event.rel
-                    offset = (offset[0] + dx, offset[1] + dy)
+                    offset = (offset[0] - dx, offset[1] - dy)
                     draw_world()
                     pygame.display.flip()
 
