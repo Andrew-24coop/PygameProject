@@ -1,9 +1,10 @@
 import pygame
 from settings import *
+from mushroom import Mushroom
 
 all_sprites = pygame.sprite.Group()
 class Main_hero(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, heigh):
+    def __init__(self, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load("img/Main_hero_sprites/main_sprite.png").convert_alpha()
@@ -43,6 +44,8 @@ class Main_hero(pygame.sprite.Sprite):
                                    pygame.image.load("img/Attack/right_sword_attack.png").convert_alpha(), True, False),
                                "UP": pygame.image.load("img/Attack/back_sword_attack.png").convert_alpha(),
                                "DOWN": pygame.image.load("img/Attack/front_sword_attack.png").convert_alpha()}
+        self.keyboard_up = True
+
         self.make_images_lists()
 
     def make_images_lists(self):
@@ -186,6 +189,8 @@ class Main_hero(pygame.sprite.Sprite):
             self.sword_frame = 0
             self.sword_attack = False
             self.blink = 5
+            if self.direction == "LEFT":
+                self.rect.x += 35
     def check_keyboard(self):
         key = pygame.key.get_pressed()
 
@@ -203,6 +208,12 @@ class Main_hero(pygame.sprite.Sprite):
 
         if key[pygame.K_LCTRL]:
             self.make_fast_moving()
+
+        if key[pygame.K_SPACE] and self.keyboard_up:
+            self.keyboard_up = False
+            self.sword_attack = True
+            if self.direction == "LEFT":
+                self.rect.x -= 35
 
         if key[pygame.K_f]:
             self.lightning_attack = True
@@ -283,15 +294,6 @@ class Lightning(pygame.sprite.Sprite):
         self.speed_x = self.rotation[direction][1]
         self.speed_y = self.rotation[direction][2]
 
-    # def rotate_lightning(self, direction):
-    #     self.image = pygame.image.load("img/Attack/lightning.png").convert_alpha()
-    #     self.image = pygame.transform.rotate(self.image,
-    #                                                    self.rotation[direction][0])
-    #     #for i in range(3):
-    #     #    self.explosion_sprites[i] = pygame.transform.rotate(self.explosion_sprites[i], self.rotation[direction][0])
-    #     self.speed_x = self.rotation[direction][1]
-    #     self.speed_y = self.rotation[direction][2]
-
 
 if __name__ == '__main__':
     pygame.init()
@@ -300,6 +302,7 @@ if __name__ == '__main__':
     running = True
     clock = pygame.time.Clock()
     player = Main_hero(400, 400, width, height)
+    mushroom = Mushroom(player, 800, 400, width, height)
     while running:
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
@@ -308,10 +311,11 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYUP:
                 player.is_move = False
                 player.moving_frame = 2
-            elif event.type == pygame.MOUSEBUTTONUP:
-                player.sword_attack = True
+                player.keyboard_up = True
         player.check_keyboard()
         screen.blit(player.image, player.rect)
         all_sprites.draw(screen)
+        mushroom.movement()
+        screen.blit(mushroom.image, mushroom.rect)
         pygame.display.flip()
         clock.tick(FPS)
