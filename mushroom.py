@@ -37,20 +37,18 @@ class Mushroom(pygame.sprite.Sprite):
         self.right_stop_sprite = pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_stop.png").convert_alpha()
 
         self.right_die_sprites = [pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_1.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_2.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_3.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_4.png").convert_alpha(),
                                   pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_5.png").convert_alpha(),
                                   pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_6.png").convert_alpha(),
                                   pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_7.png").convert_alpha(),
+                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha(),
+                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha(),
                                   pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha()]
         self.left_die_sprite = [pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_1.png").convert_alpha(),
-                                pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_2.png").convert_alpha(),
-                                pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_3.png").convert_alpha(),
-                                pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_4.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_5.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_6.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_7.png").convert_alpha(),
+                                pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_8.png").convert_alpha(),
+                                pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_8.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_8.png").convert_alpha()]
     def make_variables(self):
         self.is_move = True
@@ -136,11 +134,13 @@ class Mushroom(pygame.sprite.Sprite):
                 self.image = self.right_stop_sprite
 
     def animate_death(self):
-        self.death_frame += 0.3
-        if self.death_frame > 8:
-            self.death_frame = 7
-        if self.death_frame > 11:
+        coefficient = 0.3
+        if self.death_frame > 4:
+            coefficient = 0.05
+        self.death_frame += coefficient
+        if self.death_frame > 6:
             self.die = False
+            self.end = True
         if self.direction == "LEFT":
             self.image = self.left_die_sprite[int(self.death_frame)]
         else:
