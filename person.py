@@ -240,6 +240,9 @@ class Lightning(pygame.sprite.Sprite):
         self.par = parent
         self.image = pygame.image.load("img/Attack/lightning.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.target = None
 
         self.rotation = {"RIGHT": [0, 35, 0], "LEFT": [180, -35, 0],
                          "UP": [90, 0, -35], "DOWN": [270, 0, 35]}
@@ -263,10 +266,11 @@ class Lightning(pygame.sprite.Sprite):
 
     def update(self):
         self.attack_animation = True
-        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0:
+        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0 or pygame.sprite.collide_mask(self, self.target):
             self.speed_x = 0
             self.speed_y = 0
             self.explosion = True
+            self.target.die = True
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
@@ -303,6 +307,8 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     player = Main_hero(400, 400, width, height)
     mushroom = Mushroom(player, 800, 400, width, height)
+    player.lightning.target = mushroom
+    all_sprites.add(mushroom)
     while running:
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
@@ -314,8 +320,9 @@ if __name__ == '__main__':
                 player.keyboard_up = True
         player.check_keyboard()
         screen.blit(player.image, player.rect)
-        all_sprites.draw(screen)
         mushroom.movement()
-        screen.blit(mushroom.image, mushroom.rect)
+        if mushroom.end:
+            all_sprites.remove(mushroom)
+        all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
