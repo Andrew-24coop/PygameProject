@@ -1,5 +1,7 @@
 from worldgen import World
 from settings import *
+from person import *
+from mushroom import *
 import pygame
 
 
@@ -21,6 +23,13 @@ def main():
 
     world = World(WIDTH // TILE_SIZE, HEIGHT // TILE_SIZE, SEED)
 
+    # Initialize player and mushroom
+    player = MainHero(WIDTH // 2, HEIGHT // 2, WIDTH, HEIGHT)
+    mushroom = Mushroom(player, 800, 400, WIDTH, HEIGHT)
+    player.lightning.target = mushroom
+
+    sprites_all = pygame.sprite.Group(player, mushroom)
+
     zoom = 1
     zoom_chunk = None
     offset = (0, 0)
@@ -29,17 +38,19 @@ def main():
     def draw_world():
         screen.fill((0, 0, 0))
         if zoom == 1:
+            # Draw the entire map in zoomed-out view
             for chunk_row in world.chunks_array:
                 for chunk in chunk_row:
                     cx, cy = chunk
                     world.draw_chunk(screen, cx, cy)
             draw_grid(screen)
         else:
-            chunk_x, chunk_y = zoom_chunk
-            start_x = max(0, chunk_x - CHUNK_SIZE)
-            end_x = min(world.width, chunk_x + CHUNK_SIZE * 2)
-            start_y = max(0, chunk_y - CHUNK_SIZE)
-            end_y = min(world.height, chunk_y + CHUNK_SIZE * 2)
+            # Draw only the zoomed-in region
+            x_chunk, y_chunk = zoom_chunk
+            start_x = max(0, x_chunk - CHUNK_SIZE)
+            end_x = min(world.width, x_chunk + CHUNK_SIZE * 2)
+            start_y = max(0, y_chunk - CHUNK_SIZE)
+            end_y = min(world.height, y_chunk + CHUNK_SIZE * 2)
 
             for x in range(start_x, end_x):
                 for y in range(start_y, end_y):
@@ -59,9 +70,6 @@ def main():
                             ),
                         )
             draw_grid(screen, zoom, offset)
-
-    draw_world()
-    pygame.display.flip()
 
     running = True
     while running:
@@ -96,17 +104,32 @@ def main():
                         prev_chunk = None
                         draw_world()
                         pygame.display.flip()
-            elif event.type == pygame.MOUSEMOTION:
-                if pygame.mouse.get_pressed()[0] and zoom > 1:
-                    dx, dy = event.rel
-                    offset = (offset[0] - dx, offset[1] - dy)
-                    draw_world()
-                    pygame.display.flip()
+            elif event.type == pygame.KEYUP:
+                player.is_move = False
+                player.moving_frame = 2
+                player.keyboard_up = True
 
+        player.check_keyboard()
+
+        # Center the player
+        if zoom > 1:
+            offset = (
+                player.rect.centerx * zoom - WIDTH // 2,
+                player.rect.centery * zoom - HEIGHT // 2,
+            )
+
+        # Draw the world
+        draw_world()
+
+        # Draw player and mushroom only if zoomed in
+        if zoom > 1:
+            sprites_all.update()
+            sprites_all.draw(screen)
+
+        # Highlight the chunk under the player
         if zoom == 1:
-            mouse_pos = pygame.mouse.get_pos()
-            chunk_x = (mouse_pos[0] // (CHUNK_SIZE * TILE_SIZE)) * CHUNK_SIZE
-            chunk_y = (mouse_pos[1] // (CHUNK_SIZE * TILE_SIZE)) * CHUNK_SIZE
+            chunk_x = (player.rect.centerx // (CHUNK_SIZE * TILE_SIZE)) * CHUNK_SIZE
+            chunk_y = (player.rect.centery // (CHUNK_SIZE * TILE_SIZE)) * CHUNK_SIZE
             current_chunk = (chunk_x, chunk_y)
             if current_chunk != prev_chunk:
                 if prev_chunk:
@@ -116,6 +139,7 @@ def main():
                 prev_chunk = current_chunk
                 pygame.display.flip()
 
+        pygame.display.flip()
         clock.tick(FPS)
 
     pygame.quit()

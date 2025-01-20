@@ -3,10 +3,32 @@ from settings import *
 from mushroom import Mushroom
 
 all_sprites = pygame.sprite.Group()
-class Main_hero(pygame.sprite.Sprite):
+
+
+class MainHero(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
+        self.down_moving_pictures = None
+        self.down_stop_pictures = None
+        self.left_stop_pictures = None
+        self.up_moving_pictures = None
+        self.left_moving_pictures = None
+        self.right_stop_pictures = None
+        self.right_moving_pictures = None
+        self.sword_rotation = None
+        self.sword_frame = None
+        self.keyboard_up = None
+        self.sword_attack = None
+        self.lightning_attack = None
+        self.fast_moving = None
+        self.direction = None
+        self.blink = None
+        self.stop_frame = None
+        self.moving_frame = None
+        self.is_move = None
+        self.pos_y = None
+        self.pos_x = None
         self.image = pygame.image.load("img/Main_hero_sprites/main_sprite.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
 
@@ -53,30 +75,29 @@ class Main_hero(pygame.sprite.Sprite):
                                       pygame.image.load('img/Main_hero_sprites/sprite_8.png').convert_alpha(),
                                       pygame.image.load('img/Main_hero_sprites/sprite_10.png').convert_alpha()]
         self.left_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_7.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_9.png').convert_alpha()]
+                                     pygame.image.load('img/Main_hero_sprites/sprite_7.png').convert_alpha(),
+                                     pygame.image.load('img/Main_hero_sprites/sprite_9.png').convert_alpha()]
         self.up_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_3.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_11.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_12.png').convert_alpha()]
+                                   pygame.image.load('img/Main_hero_sprites/sprite_11.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_12.png').convert_alpha()]
         self.down_moving_pictures = [pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_6.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_5.png').convert_alpha()]
+                                     pygame.image.load('img/Main_hero_sprites/sprite_6.png').convert_alpha(),
+                                     pygame.image.load('img/Main_hero_sprites/sprite_5.png').convert_alpha()]
         self.down_stop_pictures = [pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_14.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha()]
+                                   pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_14.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha()]
         self.left_stop_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_16.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha()]
+                                   pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_16.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha()]
         self.right_stop_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_18.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha()]
-
+                                    pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
+                                    pygame.image.load('img/Main_hero_sprites/sprite_18.png').convert_alpha(),
+                                    pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
+                                    pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha()]
 
     def movement(self, *args):
         if self.fast_moving:
@@ -141,7 +162,7 @@ class Main_hero(pygame.sprite.Sprite):
             self.stop_frame += low_coefficient
             if self.stop_frame > 5:
                 self.stop_frame = 0
-            if self.blink > 5 and self.blink < 7 or self.blink == 0.1:
+            if 5 < self.blink < 7 or self.blink == 0.1:
                 if self.direction == "RIGHT":
                     self.image = self.right_stop_pictures[int(self.stop_frame)]
                 elif self.direction == "LEFT":
@@ -191,6 +212,7 @@ class Main_hero(pygame.sprite.Sprite):
             self.blink = 5
             if self.direction == "LEFT":
                 self.rect.x += 35
+
     def check_keyboard(self):
         key = pygame.key.get_pressed()
 
@@ -223,7 +245,6 @@ class Main_hero(pygame.sprite.Sprite):
                 self.lightning.rect.y = self.rect.y + 20
                 self.lightning.rotate_lightning(self.direction)
 
-
         # Для прыжков
         # if key[pygame.K_SPACE]:
         #     if player.is_on_ground:
@@ -232,6 +253,7 @@ class Main_hero(pygame.sprite.Sprite):
         #         player.is_on_ground = False
         # player.movement(height - player.rect.height)
         self.movement()
+
 
 class Lightning(pygame.sprite.Sprite):
     def __init__(self, parent, x, y, width, height):
@@ -258,7 +280,6 @@ class Lightning(pygame.sprite.Sprite):
         explosion_image_3 = pygame.image.load("img/Attack/lightning_exploding3.png").convert_alpha()
         self.explosion_sprites = [explosion_image_1, explosion_image_2, explosion_image_3]
 
-
         self.explosion_frame = 0
 
         self.speed_x = 0
@@ -266,7 +287,8 @@ class Lightning(pygame.sprite.Sprite):
 
     def update(self):
         self.attack_animation = True
-        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0 or pygame.sprite.collide_mask(self, self.target):
+        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0 or pygame.sprite.collide_mask(
+                self, self.target):
             self.speed_x = 0
             self.speed_y = 0
             self.explosion = True
@@ -292,20 +314,21 @@ class Lightning(pygame.sprite.Sprite):
     def rotate_lightning(self, direction):
         self.image = pygame.image.load("img/Attack/lightning.png").convert_alpha()
         self.image = pygame.transform.rotate(self.image,
-                                                       self.rotation[direction][0])
-        #for i in range(3):
+                                             self.rotation[direction][0])
+        # for i in range(3):
         #    self.explosion_sprites[i] = pygame.transform.rotate(self.explosion_sprites[i], self.rotation[direction][0])
         self.speed_x = self.rotation[direction][1]
         self.speed_y = self.rotation[direction][2]
 
 
+"""
 if __name__ == '__main__':
     pygame.init()
     size = width, height = (SIZE)
     screen = pygame.display.set_mode(size)
     running = True
     clock = pygame.time.Clock()
-    player = Main_hero(400, 400, width, height)
+    player = MainHero(400, 400, width, height)
     mushroom = Mushroom(player, 800, 400, width, height)
     player.lightning.target = mushroom
     all_sprites.add(mushroom)
@@ -326,3 +349,4 @@ if __name__ == '__main__':
         all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
+"""

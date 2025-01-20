@@ -1,8 +1,25 @@
 import pygame
+
+
 class Mushroom(pygame.sprite.Sprite):
     def __init__(self, target, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
+        self.end = None
+        self.death_frame = None
+        self.die = None
+        self.direction = None
+        self.right_frame = None
+        self.left_frame = None
+        self.speed_y = None
+        self.speed_x = None
+        self.left_die_sprite = None
+        self.right_die_sprites = None
+        self.right_stop_sprite = None
+        self.right_run_sprites = None
+        self.left_stop_sprite = None
+        self.left_run_sprites = None
+        self.is_move = None
         self.image = pygame.image.load("img/Main_hero_sprites/main_sprite.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
 
@@ -26,23 +43,25 @@ class Mushroom(pygame.sprite.Sprite):
                                  pygame.image.load("img/Mushroom_sprites/Run/left_mushroom_run_8.png").convert_alpha()]
         self.left_stop_sprite = pygame.image.load("img/Mushroom_sprites/Run/left_mushroom_stop.png").convert_alpha()
 
-        self.right_run_sprites = [pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_1.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_2.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_3.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_4.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_5.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_6.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_7.png").convert_alpha(),
-                                 pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_8.png").convert_alpha()]
+        self.right_run_sprites = [
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_1.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_2.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_3.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_4.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_5.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_6.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_7.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_run_8.png").convert_alpha()]
         self.right_stop_sprite = pygame.image.load("img/Mushroom_sprites/Run/right_mushroom_stop.png").convert_alpha()
 
-        self.right_die_sprites = [pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_1.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_5.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_6.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_7.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha(),
-                                  pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha()]
+        self.right_die_sprites = [
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_1.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_5.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_6.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_7.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha(),
+            pygame.image.load("img/Mushroom_sprites/Die/right_mushroom_die_8.png").convert_alpha()]
         self.left_die_sprite = [pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_1.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_5.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_6.png").convert_alpha(),
@@ -50,6 +69,7 @@ class Mushroom(pygame.sprite.Sprite):
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_8.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_8.png").convert_alpha(),
                                 pygame.image.load("img/Mushroom_sprites/Die/left_mushroom_die_8.png").convert_alpha()]
+
     def make_variables(self):
         self.is_move = True
 
@@ -65,7 +85,6 @@ class Mushroom(pygame.sprite.Sprite):
         self.death_frame = 0
 
         self.end = False
-
 
     def determine_direction(self):
         if self.rect.x < self.target.rect.x:
@@ -104,6 +123,7 @@ class Mushroom(pygame.sprite.Sprite):
                 self.is_move = False
                 self.speed_x = 0
                 self.speed_y = 0
+
     def movement(self):
         self.determine_direction()
         self.put_sprites()
@@ -145,7 +165,3 @@ class Mushroom(pygame.sprite.Sprite):
             self.image = self.left_die_sprite[int(self.death_frame)]
         else:
             self.image = self.right_die_sprites[int(self.death_frame)]
-
-
-
-
