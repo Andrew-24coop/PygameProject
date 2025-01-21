@@ -1,8 +1,11 @@
 import pygame
+import numpy as np
+
 from settings import *
 from mushroom import Mushroom
 
 all_sprites = pygame.sprite.Group()
+main_hero_sprite = pygame.sprite.Group()
 class Main_hero(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
@@ -18,6 +21,8 @@ class Main_hero(pygame.sprite.Sprite):
         self.make_variables()
 
     def make_variables(self):
+        self.hp = 5
+
         self.pos_x = 0
         self.pos_y = 0
         # Для прыжков
@@ -117,43 +122,50 @@ class Main_hero(pygame.sprite.Sprite):
         else:
             self.put_sprites()
 
+        if self.hp == 0:
+            main_hero_sprite.remove(self)
+
+
     def put_sprites(self):
-        coefficient = 0.2
-        low_coefficient = 0.3
-        if self.fast_moving:
-            coefficient = 0.3
-        if self.is_move:
-            self.blink = 0
-            self.stop_frame = 0
-            self.moving_frame += coefficient
-            if self.moving_frame > 3:
-                self.moving_frame = 0
-            if self.direction == "RIGHT":
-                self.image = self.right_moving_pictures[int(self.moving_frame)]
-            elif self.direction == "LEFT":
-                self.image = self.left_moving_pictures[int(self.moving_frame)]
-            elif self.direction == "UP":
-                self.image = self.up_moving_pictures[int(self.moving_frame)]
-            elif self.direction == "DOWN":
-                self.image = self.down_moving_pictures[int(self.moving_frame)]
-        else:
-            self.blink += 0.1
-            self.stop_frame += low_coefficient
-            if self.stop_frame > 5:
-                self.stop_frame = 0
-            if self.blink > 5 and self.blink < 7 or self.blink == 0.1:
-                if self.direction == "RIGHT":
-                    self.image = self.right_stop_pictures[int(self.stop_frame)]
-                elif self.direction == "LEFT":
-                    self.image = self.left_stop_pictures[int(self.stop_frame)]
-                elif self.direction == "UP":
-                    self.image = self.up_moving_pictures[0]
-                elif self.direction == "DOWN":
-                    self.image = self.down_stop_pictures[int(self.stop_frame)]
-            elif self.blink > 7:
-                self.stop_frame = 0
+            coefficient = 0.2
+            low_coefficient = 0.3
+            if self.fast_moving:
+                coefficient = 0.3
+            if self.is_move:
                 self.blink = 0
-            self.moving_frame = 2
+                self.stop_frame = 0
+                self.moving_frame += coefficient
+                if self.moving_frame > 3:
+                    self.moving_frame = 0
+                if self.direction == "RIGHT":
+                    self.image = self.right_moving_pictures[int(self.moving_frame)]
+                elif self.direction == "LEFT":
+                    self.image = self.left_moving_pictures[int(self.moving_frame)]
+                elif self.direction == "UP":
+                    self.image = self.up_moving_pictures[int(self.moving_frame)]
+                elif self.direction == "DOWN":
+                    self.image = self.down_moving_pictures[int(self.moving_frame)]
+            else:
+                self.blink += 0.1
+                self.stop_frame += low_coefficient
+                if self.stop_frame > 5:
+                    self.stop_frame = 0
+                if self.blink > 5 and self.blink < 7 or self.blink == 0.1:
+                    if self.direction == "RIGHT":
+                        self.image = self.right_stop_pictures[int(self.stop_frame)]
+                    elif self.direction == "LEFT":
+                        self.image = self.left_stop_pictures[int(self.stop_frame)]
+                    elif self.direction == "UP":
+                        self.image = self.up_moving_pictures[0]
+                    elif self.direction == "DOWN":
+                        self.image = self.down_stop_pictures[int(self.stop_frame)]
+                elif self.blink > 7:
+                    self.stop_frame = 0
+                    self.blink = 0
+                self.moving_frame = 2
+            # if mushroom.attack:
+            #     self.image = self.apply_red_filter(self.image)
+
 
     def make_right_true(self):
         self.pos_x = 5
@@ -232,6 +244,15 @@ class Main_hero(pygame.sprite.Sprite):
         #         player.is_on_ground = False
         # player.movement(height - player.rect.height)
         self.movement()
+    def apply_red_filter(self, surface):
+        arr = pygame.surfarray.array3d(surface)  # Получаем цветовую составляющую
+
+        # Убираем зеленую и синюю составляющие, оставляя красную
+        red_filtered = np.copy(arr)
+        red_filtered[:, :, 1] = 0  # Убираем зеленый канал
+        red_filtered[:, :, 2] = 0  # Убираем синий канал
+
+        return pygame.surfarray.make_surface(red_filtered)
 
 class Lightning(pygame.sprite.Sprite):
     def __init__(self, parent, x, y, width, height):
@@ -266,11 +287,15 @@ class Lightning(pygame.sprite.Sprite):
 
     def update(self):
         self.attack_animation = True
-        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0 or pygame.sprite.collide_mask(self, self.target):
+        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0:
             self.speed_x = 0
             self.speed_y = 0
             self.explosion = True
+        elif pygame.sprite.collide_mask(self, self.target) and not self.target.end:
             self.target.die = True
+            self.speed_x = 0
+            self.speed_y = 0
+            self.explosion = True
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
@@ -301,13 +326,13 @@ class Lightning(pygame.sprite.Sprite):
 
 if __name__ == '__main__':
     pygame.init()
-    size = width, height = (SIZE)
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(SIZE)
     running = True
     clock = pygame.time.Clock()
-    player = Main_hero(400, 400, width, height)
-    mushroom = Mushroom(player, 800, 400, width, height)
+    player = Main_hero(400, 400, WIDTH, HEIGHT)
+    mushroom = Mushroom(player, 800, 400, 1000, 1000)
     player.lightning.target = mushroom
+    main_hero_sprite.add(player)
     all_sprites.add(mushroom)
     while running:
         screen.fill((0, 0, 0))
@@ -319,10 +344,11 @@ if __name__ == '__main__':
                 player.moving_frame = 2
                 player.keyboard_up = True
         player.check_keyboard()
-        screen.blit(player.image, player.rect)
-        mushroom.movement()
+        if not mushroom.end:
+            mushroom.movement()
         if mushroom.end:
             all_sprites.remove(mushroom)
+        main_hero_sprite.draw(screen)
         all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
