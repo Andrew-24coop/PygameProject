@@ -17,11 +17,16 @@ class Main_hero(pygame.sprite.Sprite):
         self.height = height
 
         self.lightning = Lightning(self, x, y, width, height)
+        self.bars = Bars(30, 10)
 
         self.make_variables()
 
     def make_variables(self):
         self.hp = 5
+        self.damage = 1
+        self.protection = 0
+        self.food = 5
+        self.energy = 100
 
         self.pos_x = 0
         self.pos_y = 0
@@ -50,6 +55,8 @@ class Main_hero(pygame.sprite.Sprite):
                                "UP": pygame.image.load("img/Attack/back_sword_attack.png").convert_alpha(),
                                "DOWN": pygame.image.load("img/Attack/front_sword_attack.png").convert_alpha()}
         self.keyboard_up = True
+
+        self.map_offset = []
 
         self.make_images_lists()
 
@@ -86,12 +93,15 @@ class Main_hero(pygame.sprite.Sprite):
     def movement(self, *args):
         if self.fast_moving:
             if self.direction == "RIGHT" or self.direction == "LEFT":
-                self.pos_x = self.pos_x * 1.5
+                self.pos_x = self.pos_x * 2
             elif self.direction == "UP" or self.direction == "DOWN":
-                self.pos_y = self.pos_y * 1.5
+                self.pos_y = self.pos_y * 2
 
-        self.rect.x += self.pos_x
-        self.rect.y += self.pos_y
+        #self.rect.x += self.pos_x
+        #self.rect.y += self.pos_y
+
+        self.map_offset = (self.pos_x, self.pos_y)
+
 
         if self.lightning_attack:
             if self.lightning.explosion:
@@ -122,15 +132,15 @@ class Main_hero(pygame.sprite.Sprite):
         else:
             self.put_sprites()
 
-        if self.hp == 0:
+        if self.hp <= 0:
             main_hero_sprite.remove(self)
 
 
     def put_sprites(self):
-            coefficient = 0.2
+            coefficient = 0.3
             low_coefficient = 0.3
             if self.fast_moving:
-                coefficient = 0.3
+                coefficient = 0.4
             if self.is_move:
                 self.blink = 0
                 self.stop_frame = 0
@@ -201,8 +211,8 @@ class Main_hero(pygame.sprite.Sprite):
             self.sword_frame = 0
             self.sword_attack = False
             self.blink = 5
-            if self.direction == "LEFT":
-                self.rect.x += 35
+            # if self.direction == "LEFT":
+            #     self.rect.x += 40
     def check_keyboard(self):
         key = pygame.key.get_pressed()
 
@@ -224,17 +234,17 @@ class Main_hero(pygame.sprite.Sprite):
         if key[pygame.K_SPACE] and self.keyboard_up:
             self.keyboard_up = False
             self.sword_attack = True
-            if self.direction == "LEFT":
-                self.rect.x -= 35
+            # if self.direction == "LEFT":
+            #     self.rect.x -= 35
 
         if key[pygame.K_f]:
-            self.lightning_attack = True
-            all_sprites.add(self.lightning)
-            if not self.lightning.attack_animation:
-                self.lightning.rect.x = self.rect.x
-                self.lightning.rect.y = self.rect.y + 20
-                self.lightning.rotate_lightning(self.direction)
-
+            if self.energy >= 5:
+                self.lightning_attack = True
+                all_sprites.add(self.lightning)
+                if not self.lightning.attack_animation:
+                    self.lightning.rect.x = self.rect.x
+                    self.lightning.rect.y = self.rect.y + 20
+                    self.lightning.rotate_lightning(self.direction)
 
         # Для прыжков
         # if key[pygame.K_SPACE]:
@@ -262,6 +272,8 @@ class Lightning(pygame.sprite.Sprite):
         self.image = pygame.image.load("img/Attack/lightning.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
         self.mask = pygame.mask.from_surface(self.image)
+
+        self.damage = 10
 
         self.target = None
 
@@ -291,11 +303,11 @@ class Lightning(pygame.sprite.Sprite):
             self.speed_x = 0
             self.speed_y = 0
             self.explosion = True
-        elif pygame.sprite.collide_mask(self, self.target) and not self.target.end:
-            self.target.die = True
-            self.speed_x = 0
-            self.speed_y = 0
-            self.explosion = True
+        # elif pygame.sprite.collide_mask(self, self.target) and not self.target.end:
+        #     self.target.hp -= self.damage
+        #     self.speed_x = 0
+        #     self.speed_y = 0
+        #     self.explosion = True
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
@@ -309,6 +321,7 @@ class Lightning(pygame.sprite.Sprite):
             self.par.lightning_attack = False
             self.speed_x = 0
             self.speed_y = 0
+            self.par.energy = 0
             return True
         else:
             self.image = self.explosion_sprites[int(self.explosion_frame)]
@@ -323,32 +336,75 @@ class Lightning(pygame.sprite.Sprite):
         self.speed_x = self.rotation[direction][1]
         self.speed_y = self.rotation[direction][2]
 
+class Bars(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
 
-if __name__ == '__main__':
-    pygame.init()
-    screen = pygame.display.set_mode(SIZE)
-    running = True
-    clock = pygame.time.Clock()
-    player = Main_hero(400, 400, WIDTH, HEIGHT)
-    mushroom = Mushroom(player, 800, 400, 1000, 1000)
-    player.lightning.target = mushroom
-    main_hero_sprite.add(player)
-    all_sprites.add(mushroom)
-    while running:
-        screen.fill((0, 0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYUP:
-                player.is_move = False
-                player.moving_frame = 2
-                player.keyboard_up = True
-        player.check_keyboard()
-        if not mushroom.end:
-            mushroom.movement()
-        if mushroom.end:
-            all_sprites.remove(mushroom)
-        main_hero_sprite.draw(screen)
-        all_sprites.draw(screen)
-        pygame.display.flip()
-        clock.tick(FPS)
+        self.health_bar = pygame.image.load("img/Bars/Health/health_bar_1.png").convert_alpha()
+        self.food_bar = pygame.image.load("img/Bars/Food/food_bar_1.png").convert_alpha()
+        self.energy_bar = pygame.image.load("img/Bars/Energy/energy_bar_1.png").convert_alpha()
+        self.protection_bar = pygame.image.load("img/Bars/Protection/protection_bar_1.png").convert_alpha()
+
+        self.health_rect = self.health_bar.get_rect(center=(x, y))
+        self.food_rect = self.food_bar.get_rect(center=(x, y + 15))
+        self.energy_rect = self.energy_bar.get_rect(center=(x, y + 30))
+        self.protection_rect = self.protection_bar.get_rect(center=(x, y + 45))
+
+
+        self.health_bar_sprites = [pygame.image.load(f"img/Bars/Health/health_bar_{i}.png").convert_alpha()
+                                   for i in range(6)]
+        self.food_bar_sprites = [pygame.image.load(f"img/Bars/Food/food_bar_{i}.png").convert_alpha()
+                                   for i in range(6)]
+        self.energy_bar_sprites = [pygame.image.load(f"img/Bars/Energy/energy_bar_{i}.png").convert_alpha()
+                                   for i in range(6)]
+        self.protection_bar_sprites = [pygame.image.load(f"img/Bars/Protection/protection_bar_{i}.png").convert_alpha()
+                                   for i in range(6)]
+
+    def draw(self, screen, health, food, energy, protection):
+        self.health_bar = self.health_bar_sprites[health]
+        screen.blit(self.health_bar, self.health_rect)
+
+        self.food_bar = self.food_bar_sprites[food]
+        screen.blit(self.food_bar, self.food_rect)
+
+        self.energy_bar = self.energy_bar_sprites[energy]
+        screen.blit(self.energy_bar, self.energy_rect)
+
+        self.protection_bar = self.protection_bar_sprites[protection]
+        screen.blit(self.protection_bar, self.protection_rect)
+
+
+
+
+
+
+#
+# if __name__ == '__main__':
+#     pygame.init()
+#     screen = pygame.display.set_mode(SIZE)
+#     running = True
+#     clock = pygame.time.Clock()
+#     player = Main_hero(400, 400, WIDTH, HEIGHT)
+#     mushroom = Mushroom(player, 800, 400, 1000, 1000)
+#     player.lightning.target = mushroom
+#     main_hero_sprite.add(player)
+#     all_sprites.add(mushroom)
+#     while running:
+#         screen.fill((0, 0, 0))
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 running = False
+#             elif event.type == pygame.KEYUP:
+#                 player.is_move = False
+#                 player.moving_frame = 2
+#                 player.keyboard_up = True
+#         player.check_keyboard()
+#         player.bars.draw(screen, player.hp, player.food, player.energy, player.protection)
+#         if not mushroom.end:
+#             mushroom.movement()
+#         if mushroom.end:
+#             all_sprites.remove(mushroom)
+#         main_hero_sprite.draw(screen)
+#         all_sprites.draw(screen)
+#         pygame.display.flip()
+#         clock.tick(FPS)

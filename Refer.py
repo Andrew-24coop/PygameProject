@@ -16,7 +16,7 @@ class Refer_background(pygame.sprite.Sprite):
         self.background_sprites = [pygame.image.load(f"img/Main_menu_background/Refer_background/{i}.jpeg") for i in range(1, 9)]
 
     def change_sprite(self):
-        self.frame += 0.2
+        self.frame += 0.1
         if self.frame > 7.8:
             self.frame = 0
         self.image = self.background_sprites[int(self.frame)]

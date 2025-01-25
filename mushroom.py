@@ -1,5 +1,5 @@
 import pygame
-from sprite_editor import make_hit_image
+import numpy as np
 class Mushroom(pygame.sprite.Sprite):
     def __init__(self, target, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
@@ -26,6 +26,7 @@ class Mushroom(pygame.sprite.Sprite):
         self.left_stun_sprites = [pygame.image.load(f"img/Mushroom_sprites/Attack/left_stun_{i}.png").convert_alpha() for i in range(1, 5)]
         self.right_stun_sprites = [pygame.transform.flip(self.left_stun_sprites[i], True, False) for i in range(4)]
     def make_variables(self):
+        self.hp = 3
         self.speed_x = 0
         self.speed_y = 0
 
@@ -39,6 +40,8 @@ class Mushroom(pygame.sprite.Sprite):
 
         self.attack = False
         self.attack_frame = 0
+
+        self.is_hit = False
 
         self.end = False
 
@@ -85,8 +88,12 @@ class Mushroom(pygame.sprite.Sprite):
                 self.speed_x = 0
                 self.speed_y = 0
 
+        if abs(self.rect.x - self.target.rect.x) <= 40 and abs(self.rect.y - self.target.rect.y) <= 20:
+            self.is_hit = True
+
     def movement(self):
         self.determine_direction()
+        self.check_hit()
         if self.die:
             self.animate_death()
         elif self.attack:
@@ -156,6 +163,28 @@ class Mushroom(pygame.sprite.Sprite):
             self.image = self.left_attack_sprite[int(self.attack_frame)]
         else:
             self.image = self.right_attack_sprite[int(self.attack_frame)]
+
+    def check_hit(self):
+        if self.target.sword_frame > 0.8 and self.is_hit:
+            self.is_hit = False
+            self.hp -= self.target.damage
+            self.target.energy += 1
+            if self.target.energy > 5:
+                self.target.energy = 5
+            self.image = self.apply_red_filter(self.image)
+        if self.hp <= 0:
+            self.die = True
+
+    def apply_red_filter(self, surface):
+        arr = pygame.surfarray.array3d(surface)  # Получаем цветовую составляющую
+
+        # Убираем зеленую и синюю составляющие, оставляя красную
+        red_filtered = np.copy(arr)
+        red_filtered[:, :, 1] = 0  # Убираем зеленый канал
+        red_filtered[:, :, 2] = 0  # Убираем синий канал
+
+        return pygame.surfarray.make_surface(red_filtered)
+
 
 
 

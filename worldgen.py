@@ -37,7 +37,7 @@ class World:
             self.chunks_array.append(row)
 
     def get_terrain_color(self, height_value):
-        if height_value < -0.1:
+        if height_value < -0.15:
             return COLORS["ocean"]
         elif height_value < 0.01:
             return COLORS["sand"]

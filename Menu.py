@@ -13,10 +13,14 @@ class Main_background(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
         self.coefficient = 1
+        self.delay = 0
     def movement(self):
-        if self.rect.x + WIDTH == 800 or self.rect.x == 0:
-            self.coefficient = -self.coefficient
-        self.rect.x += self.coefficient
+        self.delay += 1
+        if self.delay == 3:
+            self.delay = 0
+            if self.rect.x + WIDTH == 800 or self.rect.x == 0:
+                self.coefficient = -self.coefficient
+            self.rect.x += self.coefficient
 
 class Menu():
     def __init__(self):

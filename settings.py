@@ -5,7 +5,7 @@ SIZE = (WIDTH, HEIGHT)
 TILE_SIZE = 1
 CHUNK_SIZE = 50
 
-FPS = 30
+FPS = 60
 SEED = random.randint(0, 255)
 
 COLORS = {
