@@ -211,8 +211,8 @@ class Main_hero(pygame.sprite.Sprite):
             self.sword_frame = 0
             self.sword_attack = False
             self.blink = 5
-            # if self.direction == "LEFT":
-            #     self.rect.x += 40
+            if self.direction == "LEFT":
+                self.rect.x += 35
     def check_keyboard(self):
         key = pygame.key.get_pressed()
 
@@ -234,8 +234,8 @@ class Main_hero(pygame.sprite.Sprite):
         if key[pygame.K_SPACE] and self.keyboard_up:
             self.keyboard_up = False
             self.sword_attack = True
-            # if self.direction == "LEFT":
-            #     self.rect.x -= 35
+            if self.direction == "LEFT":
+                self.rect.x -= 35
 
         if key[pygame.K_f]:
             if self.energy >= 5:
@@ -245,6 +245,7 @@ class Main_hero(pygame.sprite.Sprite):
                     self.lightning.rect.x = self.rect.x
                     self.lightning.rect.y = self.rect.y + 20
                     self.lightning.rotate_lightning(self.direction)
+
 
         # Для прыжков
         # if key[pygame.K_SPACE]:

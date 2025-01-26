@@ -1,6 +1,7 @@
 from worldgen import World
 from settings import *
 from person import *
+from person import *
 import pygame
 
 
@@ -89,16 +90,12 @@ def main():
                     )
         screen.blit(player.image, player.rect)
 
-    draw_world()
-    pygame.display.flip()
-
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                #player.keyboard_up = False
                 if event.key == pygame.K_m:
                     zoom = 1
                     zoom_chunk = None
