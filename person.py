@@ -3,15 +3,18 @@ import numpy as np
 
 from settings import *
 from mushroom import Mushroom
+from player_status import *
 
-all_sprites = pygame.sprite.Group()
-main_hero_sprite = pygame.sprite.Group()
+targets = pygame.sprite.Group()
+dragon = pygame.sprite.Group()
+lightning_sprite = pygame.sprite.Group()
 class Main_hero(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load("img/Main_hero_sprites/main_sprite.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
+        self.mask = pygame.mask.from_surface(self.image)
 
         self.width = width
         self.height = height
@@ -26,10 +29,12 @@ class Main_hero(pygame.sprite.Sprite):
         self.damage = 1
         self.protection = 0
         self.food = 5
-        self.energy = 100
+        self.energy = 0
 
         self.pos_x = 0
         self.pos_y = 0
+        self.dx = 0
+        self.dy = 0
         # Для прыжков
         # self.jump = 0
         # self.is_on_ground = False
@@ -57,8 +62,17 @@ class Main_hero(pygame.sprite.Sprite):
         self.keyboard_up = True
 
         self.map_offset = []
-
         self.make_images_lists()
+
+        self.sword_miss_sound = pygame.mixer.Sound("sounds/promah-pri-boe-na-mechah.mp3")
+        self.sword_hit_sound = pygame.mixer.Sound("sounds/nasajivayuschiy-pronikayuschiy-udar.mp3")
+        self.sounds_of_walking = [pygame.mixer.Sound("sounds/byistraya-hodba-po-graviyu-26129 (mp3cut.net).mp3"),
+                                  pygame.mixer.Sound("sounds/byistraya-hodba-po-graviyu-26129 (mp3cut.net) (1).mp3"),
+                                  pygame.mixer.Sound("sounds/byistraya-hodba-po-graviyu-26129 (mp3cut.net) (2).mp3"),
+                                  pygame.mixer.Sound("sounds/byistraya-hodba-po-graviyu-26129 (mp3cut.net) (3).mp3"),
+                                  pygame.mixer.Sound("sounds/byistraya-hodba-po-graviyu-26129 (mp3cut.net) (4).mp3")]
+        self.sound_frame = 0
+        self.sound_delay = 0
 
     def make_images_lists(self):
         self.right_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha(),
@@ -90,7 +104,7 @@ class Main_hero(pygame.sprite.Sprite):
                                       pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha()]
 
 
-    def movement(self, *args):
+    def movement(self):
         if self.fast_moving:
             if self.direction == "RIGHT" or self.direction == "LEFT":
                 self.pos_x = self.pos_x * 2
@@ -100,7 +114,10 @@ class Main_hero(pygame.sprite.Sprite):
         #self.rect.x += self.pos_x
         #self.rect.y += self.pos_y
 
-        self.map_offset = (self.pos_x, self.pos_y)
+        self.dx += self.pos_x / 22
+        self.dy += self.pos_y / 22
+
+        self.map_offset = [self.pos_x, self.pos_y, int(self.dx), int(self.dy)]
 
 
         if self.lightning_attack:
@@ -132,21 +149,22 @@ class Main_hero(pygame.sprite.Sprite):
         else:
             self.put_sprites()
 
-        if self.hp <= 0:
-            main_hero_sprite.remove(self)
+        # if self.hp <= 0:
+        #     main_hero_sprite.remove(self)
 
 
     def put_sprites(self):
-            coefficient = 0.3
+            coefficient = 0.2
             low_coefficient = 0.3
             if self.fast_moving:
-                coefficient = 0.4
+                coefficient = 0.3
             if self.is_move:
                 self.blink = 0
                 self.stop_frame = 0
                 self.moving_frame += coefficient
                 if self.moving_frame > 3:
                     self.moving_frame = 0
+                self.play_walking_sound()
                 if self.direction == "RIGHT":
                     self.image = self.right_moving_pictures[int(self.moving_frame)]
                 elif self.direction == "LEFT":
@@ -175,6 +193,19 @@ class Main_hero(pygame.sprite.Sprite):
                 self.moving_frame = 2
             # if mushroom.attack:
             #     self.image = self.apply_red_filter(self.image)
+
+    def play_walking_sound(self):
+        if self.sound_delay == 0:
+            self.sounds_of_walking[self.sound_frame].play()
+            self.sound_frame += 1
+            if self.sound_frame > 4:
+                self.sound_frame = 0
+            self.sound_delay += 0.2
+        else:
+            self.sound_delay += 0.1
+            if self.sound_delay > 0.5:
+                self.sound_delay = 0
+
 
 
     def make_right_true(self):
@@ -211,8 +242,9 @@ class Main_hero(pygame.sprite.Sprite):
             self.sword_frame = 0
             self.sword_attack = False
             self.blink = 5
-            if self.direction == "LEFT":
-                self.rect.x += 35
+            self.sword_miss_sound.play()
+            # if self.direction == "LEFT":
+            #     self.rect.x += 35
     def check_keyboard(self):
         key = pygame.key.get_pressed()
 
@@ -234,13 +266,14 @@ class Main_hero(pygame.sprite.Sprite):
         if key[pygame.K_SPACE] and self.keyboard_up:
             self.keyboard_up = False
             self.sword_attack = True
-            if self.direction == "LEFT":
-                self.rect.x -= 35
+            # if self.direction == "LEFT":
+            #     self.rect.x -= 35
 
         if key[pygame.K_f]:
             if self.energy >= 5:
                 self.lightning_attack = True
-                all_sprites.add(self.lightning)
+                lightning_sprite.add(self.lightning)
+                self.lightning.sound_of_shot.play()
                 if not self.lightning.attack_animation:
                     self.lightning.rect.x = self.rect.x
                     self.lightning.rect.y = self.rect.y + 20
@@ -276,8 +309,6 @@ class Lightning(pygame.sprite.Sprite):
 
         self.damage = 10
 
-        self.target = None
-
         self.rotation = {"RIGHT": [0, 35, 0], "LEFT": [180, -35, 0],
                          "UP": [90, 0, -35], "DOWN": [270, 0, 35]}
 
@@ -298,17 +329,29 @@ class Lightning(pygame.sprite.Sprite):
         self.speed_x = 0
         self.speed_y = 0
 
+        self.sound_of_shot = pygame.mixer.Sound("sounds/energiya-magii-strelyaet-spetseffektami-43239 (mp3cut.net).mp3")
+        self.sound_of_explosion = pygame.mixer.Sound("sounds/energeticheskiy-vzryiv-38115 (mp3cut.net) (1).mp3")
+
     def update(self):
         self.attack_animation = True
         if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0:
             self.speed_x = 0
             self.speed_y = 0
             self.explosion = True
-        # elif pygame.sprite.collide_mask(self, self.target) and not self.target.end:
-        #     self.target.hp -= self.damage
-        #     self.speed_x = 0
-        #     self.speed_y = 0
-        #     self.explosion = True
+        for i in targets:
+            if pygame.sprite.collide_mask(self, i):
+                i.hp -= self.damage
+                self.speed_x = 0
+                self.speed_y = 0
+                self.sound_of_explosion.play()
+                self.explosion = True
+        for i in dragon:
+            if pygame.sprite.collide_mask(self, i):
+                i.hp -= self.damage
+                self.speed_x = 0
+                self.speed_y = 0
+                self.sound_of_explosion.play()
+                self.explosion = True
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
@@ -318,7 +361,7 @@ class Lightning(pygame.sprite.Sprite):
             self.explosion_frame = 0
             self.explosion = False
             self.attack_animation = False
-            all_sprites.remove(self)
+            lightning_sprite.remove(self)
             self.par.lightning_attack = False
             self.speed_x = 0
             self.speed_y = 0
@@ -337,49 +380,12 @@ class Lightning(pygame.sprite.Sprite):
         self.speed_x = self.rotation[direction][1]
         self.speed_y = self.rotation[direction][2]
 
-class Bars(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-
-        self.health_bar = pygame.image.load("img/Bars/Health/health_bar_1.png").convert_alpha()
-        self.food_bar = pygame.image.load("img/Bars/Food/food_bar_1.png").convert_alpha()
-        self.energy_bar = pygame.image.load("img/Bars/Energy/energy_bar_1.png").convert_alpha()
-        self.protection_bar = pygame.image.load("img/Bars/Protection/protection_bar_1.png").convert_alpha()
-
-        self.health_rect = self.health_bar.get_rect(center=(x, y))
-        self.food_rect = self.food_bar.get_rect(center=(x, y + 15))
-        self.energy_rect = self.energy_bar.get_rect(center=(x, y + 30))
-        self.protection_rect = self.protection_bar.get_rect(center=(x, y + 45))
-
-
-        self.health_bar_sprites = [pygame.image.load(f"img/Bars/Health/health_bar_{i}.png").convert_alpha()
-                                   for i in range(6)]
-        self.food_bar_sprites = [pygame.image.load(f"img/Bars/Food/food_bar_{i}.png").convert_alpha()
-                                   for i in range(6)]
-        self.energy_bar_sprites = [pygame.image.load(f"img/Bars/Energy/energy_bar_{i}.png").convert_alpha()
-                                   for i in range(6)]
-        self.protection_bar_sprites = [pygame.image.load(f"img/Bars/Protection/protection_bar_{i}.png").convert_alpha()
-                                   for i in range(6)]
-
-    def draw(self, screen, health, food, energy, protection):
-        self.health_bar = self.health_bar_sprites[health]
-        screen.blit(self.health_bar, self.health_rect)
-
-        self.food_bar = self.food_bar_sprites[food]
-        screen.blit(self.food_bar, self.food_rect)
-
-        self.energy_bar = self.energy_bar_sprites[energy]
-        screen.blit(self.energy_bar, self.energy_rect)
-
-        self.protection_bar = self.protection_bar_sprites[protection]
-        screen.blit(self.protection_bar, self.protection_rect)
 
 
 
 
 
 
-#
 # if __name__ == '__main__':
 #     pygame.init()
 #     screen = pygame.display.set_mode(SIZE)
@@ -387,6 +393,7 @@ class Bars(pygame.sprite.Sprite):
 #     clock = pygame.time.Clock()
 #     player = Main_hero(400, 400, WIDTH, HEIGHT)
 #     mushroom = Mushroom(player, 800, 400, 1000, 1000)
+#     heart = Hearts(400, 100, player, all_sprites)
 #     player.lightning.target = mushroom
 #     main_hero_sprite.add(player)
 #     all_sprites.add(mushroom)
@@ -401,6 +408,7 @@ class Bars(pygame.sprite.Sprite):
 #                 player.keyboard_up = True
 #         player.check_keyboard()
 #         player.bars.draw(screen, player.hp, player.food, player.energy, player.protection)
+#         heart.animation()
 #         if not mushroom.end:
 #             mushroom.movement()
 #         if mushroom.end:

@@ -5,12 +5,13 @@ from settings import *
 
 
 class World:
-    def __init__(self, width, height, seed):
+    def __init__(self, width, height, seed, colors):
         self.width = width
         self.height = height
         self.seed = seed
         self.world_map = None
         self.chunks_array = []
+        self.colors = colors
         self.generate_map()
 
     def generate_map(self):
@@ -38,15 +39,15 @@ class World:
 
     def get_terrain_color(self, height_value):
         if height_value < -0.15:
-            return COLORS["ocean"]
+            return self.colors["ocean"]
         elif height_value < 0.01:
-            return COLORS["sand"]
+            return self.colors["sand"]
         elif height_value < 0.15:
-            return COLORS["grass"]
+            return self.colors["grass"]
         elif height_value < 0.35:
-            return COLORS["forest"]
+            return self.colors["forest"]
         else:
-            return COLORS["mountain"]
+            return self.colors["mountain"]
 
     def lighten_color(self, color, factor=1.2):
         return tuple(min(int(c * factor), 255) for c in color)

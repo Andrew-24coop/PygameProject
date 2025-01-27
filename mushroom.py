@@ -4,7 +4,7 @@ class Mushroom(pygame.sprite.Sprite):
     def __init__(self, target, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load("img/Main_hero_sprites/main_sprite.png").convert_alpha()
+        self.image = pygame.image.load("img/Mushroom_sprites/Run/left_mushroom_stop.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
 
         self.width = width
@@ -26,7 +26,7 @@ class Mushroom(pygame.sprite.Sprite):
         self.left_stun_sprites = [pygame.image.load(f"img/Mushroom_sprites/Attack/left_stun_{i}.png").convert_alpha() for i in range(1, 5)]
         self.right_stun_sprites = [pygame.transform.flip(self.left_stun_sprites[i], True, False) for i in range(4)]
     def make_variables(self):
-        self.hp = 3
+        self.hp = 10
         self.speed_x = 0
         self.speed_y = 0
 
@@ -44,6 +44,8 @@ class Mushroom(pygame.sprite.Sprite):
         self.is_hit = False
 
         self.end = False
+
+        self.sound_of_hit = pygame.mixer.Sound("sounds/udar-priglushennyiy-reshitelnyiy (mp3cut.net).mp3")
 
 
     def determine_direction(self):
@@ -102,6 +104,8 @@ class Mushroom(pygame.sprite.Sprite):
             self.put_sprites()
             self.rect.x += self.speed_x
             self.rect.y += self.speed_y
+        self.rect.x -= self.target.map_offset[0]
+        self.rect.y -= self.target.map_offset[1]
 
     def put_sprites(self):
         if self.direction == "LEFT":
@@ -147,13 +151,15 @@ class Mushroom(pygame.sprite.Sprite):
             self.attack = False
             self.stun = True
             self.attack_frame = 0
-            self.target.hp -= 1
+            self.target.hp -= 0.4
         if self.attack_frame < 3.2:
             if self.direction == "LEFT":
                 self.rect.x -= 3
             else:
                 self.rect.x += 3
         elif self.attack_frame > 3.2:
+            if self.attack_frame >= 6:
+                self.sound_of_hit.play()
             self.target.image = self.target.apply_red_filter(self.target.image)
             if self.direction == "LEFT":
                 self.rect.x += 3
@@ -168,6 +174,7 @@ class Mushroom(pygame.sprite.Sprite):
         if self.target.sword_frame > 0.8 and self.is_hit:
             self.is_hit = False
             self.hp -= self.target.damage
+            self.target.sword_hit_sound.play()
             self.target.energy += 1
             if self.target.energy > 5:
                 self.target.energy = 5

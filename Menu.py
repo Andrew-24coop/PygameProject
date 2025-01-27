@@ -1,10 +1,16 @@
 import pygame
+
 from pygame import font
-from main import main
 import pygame_widgets
-from settings import *
 from pygame_widgets.button import Button
+
+
+from main import main
+
+from settings import *
 from Refer import *
+
+from random import choice
 class Main_background(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -22,7 +28,7 @@ class Main_background(pygame.sprite.Sprite):
                 self.coefficient = -self.coefficient
             self.rect.x += self.coefficient
 
-class Menu():
+class Menu:
     def __init__(self):
         self.screen = pygame.display.set_mode(SIZE)
         font.init()
@@ -32,13 +38,29 @@ class Menu():
         self.refer = Refer(self)
         self.running = True
 
+        #self.game = Game()
+        #self.show_game = False
+
+        self.button_click_sound = pygame.mixer.Sound("sounds/knopka-vyiklyuchatelya1.mp3")
+
     def showing_refer(self):
+        self.button_click_sound.play()
         self.refer.showing_refer = True
+        self.show_game = False
+
+    def make_game_true(self):
+        self.button_click_sound.play()
+        pygame.time.wait(100)
+        #self.show_game = True
+        main()
+        #self.refer.showing_refer = False
 
     def exit(self):
+        self.button_click_sound.play()
+        pygame.time.wait(1000)
         self.running = False
 
-    def show_menu(self):
+    def Game(self):
         self.button1 = Button(
             # Mandatory Parameters
             self.screen,  # Surface to place button on
@@ -55,7 +77,7 @@ class Menu():
             hoverColour=(252, 227, 88),  # Colour of button when being hovered over
             pressedColour=(236, 180, 8),  # Colour of button when being clicked
             radius=5,  # Radius of border corners (leave empty for not curved)
-            onClick=lambda: main()  # Function to call when clicked on
+            onClick=lambda: self.make_game_true()  # Function to call when clicked on
         )
         self.button2 = Button(
             # Mandatory Parameters
@@ -91,22 +113,29 @@ class Menu():
             hoverColour=(252, 227, 88),  # Colour of button when being hovered over
             pressedColour=(236, 180, 8),  # Colour of button when being clicked
             radius=5,  # Radius of border corners (leave empty for not curved)
-            onClick=lambda: self.exit() # Function to call when clicked on
+            onClick=lambda: self.exit()  # Function to call when clicked on
         )
         pygame.init()
         pygame.display.set_caption("Rise of Empire")
         clock = pygame.time.Clock()
         self.screen.fill((0, 0, 0))
+        musics = ["sounds/1-09_-oxygene.mp3", "sounds/1-10_-equinoxe.mp3", "sounds/1-12_-dry-hands.mp3"]
+        pygame.mixer.music.load(choice(musics))
+        pygame.mixer.music.play(-1)
         while self.running:
             events = pygame.event.get()
             keys = pygame.key.get_pressed()
             for event in events:
                 if event.type == pygame.QUIT:
                     self.running = False
-            if keys[pygame.K_ESCAPE]:
+            if keys[pygame.K_ESCAPE] and self.refer.showing_refer:
+               self.button_click_sound.play()
+               pygame.time.wait(50)
                self.refer.showing_refer = False
             if self.refer.showing_refer:
                 self.refer.show_refer(self.screen)
+            # elif self.show_game:
+            #     self.game.main()
             else:
                 self.screen.fill((0, 0, 0))
                 self.background.movement()
@@ -118,4 +147,4 @@ class Menu():
         pygame.quit()
 if __name__ == "__main__":
     menu = Menu()
-    menu.show_menu()
+    menu.Game()
