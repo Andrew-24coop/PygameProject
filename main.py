@@ -48,9 +48,11 @@ def main():
     death_window = Death_window(screen)
     boss = Dragon(player, 300, 300, WIDTH, HEIGHT)
     dragon.add(boss)
+
     # корова в качестве примера
     cow = Cow(player, 100, 0, WIDTH, HEIGHT, "cow", 20)
     targets.add(cow)
+    cow.say("hello")
 
     zoom = 1
     zoom_chunk = None
