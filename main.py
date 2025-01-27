@@ -49,7 +49,7 @@ def main():
     boss = Dragon(player, 300, 300, WIDTH, HEIGHT)
     dragon.add(boss)
     # корова в качестве примера
-    cow = Cow(player, 100, 0, WIDTH, HEIGHT, "cow")
+    cow = Cow(player, 100, 0, WIDTH, HEIGHT, "cow", 20)
     targets.add(cow)
 
     zoom = 1

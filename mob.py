@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Mob(pygame.sprite.Sprite):
-    def __init__(self, target, x, y, width, height, mob):
+    def __init__(self, target, x, y, width, height, mob, hp):
         self.mob = mob
         pygame.sprite.Sprite.__init__(self)
 
@@ -18,6 +18,7 @@ class Mob(pygame.sprite.Sprite):
 
         self.make_image_lists()
         self.make_variables()
+        self.hp = hp
 
         self.sound_of_hit = None
         self.end = None
@@ -31,7 +32,6 @@ class Mob(pygame.sprite.Sprite):
         self.left_frame = None
         self.speed_y = None
         self.speed_x = None
-        self.hp = None
         self.right_stun_sprites = None
         self.left_stun_sprites = None
         self.left_attack_sprite = None
@@ -60,7 +60,6 @@ class Mob(pygame.sprite.Sprite):
         self.right_stun_sprites = [pygame.transform.flip(self.left_stun_sprites[i], True, False) for i in range(4)]
 
     def make_variables(self):
-        self.hp = 10
         self.speed_x = 0
         self.speed_y = 0
 
