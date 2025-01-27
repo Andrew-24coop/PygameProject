@@ -6,7 +6,7 @@ from Final_boss import Dragon
 from Portal import Portal
 from person import *
 import pygame
-
+from cow import *
 from random import randint
 from death_window import Death_window
 
@@ -48,8 +48,9 @@ def main():
     death_window = Death_window(screen)
     boss = Dragon(player, 300, 300, WIDTH, HEIGHT)
     dragon.add(boss)
-
-
+    # корова в качестве примера
+    cow = Cow(player, 100, 0, WIDTH, HEIGHT, "cow")
+    targets.add(cow)
 
     zoom = 1
     zoom_chunk = None
