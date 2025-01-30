@@ -50,8 +50,12 @@ class Menu:
 
     def make_game_true(self):
         self.button_click_sound.play()
+        self.running = False
         pygame.time.wait(100)
         #self.show_game = True
+        del self.button1
+        del self.button2
+        del self.button3
         main()
         #self.refer.showing_refer = False
 

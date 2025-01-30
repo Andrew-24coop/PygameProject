@@ -8,6 +8,9 @@ from player_status import *
 targets = pygame.sprite.Group()
 dragon = pygame.sprite.Group()
 lightning_sprite = pygame.sprite.Group()
+mushrooms_group = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
+portal_sprite = pygame.sprite.Group()
 class Main_hero(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
@@ -62,6 +65,7 @@ class Main_hero(pygame.sprite.Sprite):
         self.keyboard_up = True
 
         self.map_offset = []
+        self.stop_map = False
         self.make_images_lists()
 
         self.sword_miss_sound = pygame.mixer.Sound("sounds/promah-pri-boe-na-mechah.mp3")
@@ -73,6 +77,9 @@ class Main_hero(pygame.sprite.Sprite):
                                   pygame.mixer.Sound("sounds/byistraya-hodba-po-graviyu-26129 (mp3cut.net) (4).mp3")]
         self.sound_frame = 0
         self.sound_delay = 0
+
+        self.time = 0
+        self.change_food = True
 
     def make_images_lists(self):
         self.right_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha(),
@@ -114,8 +121,9 @@ class Main_hero(pygame.sprite.Sprite):
         #self.rect.x += self.pos_x
         #self.rect.y += self.pos_y
 
-        self.dx += self.pos_x / 22
-        self.dy += self.pos_y / 22
+        if not self.stop_map:
+            self.dx += self.pos_x / 22
+            self.dy += self.pos_y / 22
 
         self.map_offset = [self.pos_x, self.pos_y, int(self.dx), int(self.dy)]
 
@@ -148,6 +156,17 @@ class Main_hero(pygame.sprite.Sprite):
             self.sword_animation(self.direction)
         else:
             self.put_sprites()
+
+        self.time = int(pygame.time.get_ticks() / 1000)
+        if self.time % 2 == 0:
+            if self.change_food:
+                self.food -= 1
+                if self.food < 0:
+                    self.food = 0
+                    self.hp -= 1
+                self.change_food = False
+        else:
+            self.change_food = True
 
         # if self.hp <= 0:
         #     main_hero_sprite.remove(self)
@@ -329,31 +348,42 @@ class Lightning(pygame.sprite.Sprite):
         self.speed_x = 0
         self.speed_y = 0
 
+        self.distance = 0
+
         self.sound_of_shot = pygame.mixer.Sound("sounds/energiya-magii-strelyaet-spetseffektami-43239 (mp3cut.net).mp3")
         self.sound_of_explosion = pygame.mixer.Sound("sounds/energeticheskiy-vzryiv-38115 (mp3cut.net) (1).mp3")
 
     def update(self):
         self.attack_animation = True
-        if self.rect.x >= self.width - 80 or self.rect.x <= 0 or self.rect.y >= self.height - 80 or self.rect.y <= 0:
+        if self.distance > 1000:
+            self.distance = 0
             self.speed_x = 0
             self.speed_y = 0
             self.explosion = True
-        for i in targets:
-            if pygame.sprite.collide_mask(self, i):
+        for i in mobs:
+            if pygame.sprite.collide_mask(self, i) and not i.die:
                 i.hp -= self.damage
                 self.speed_x = 0
                 self.speed_y = 0
                 self.sound_of_explosion.play()
                 self.explosion = True
-        for i in dragon:
-            if pygame.sprite.collide_mask(self, i):
-                i.hp -= self.damage
+        for j in dragon:
+            if pygame.sprite.collide_mask(self, j) and j.is_showing:
+                j.hp -= self.damage
+                self.speed_x = 0
+                self.speed_y = 0
+                self.sound_of_explosion.play()
+                self.explosion = True
+        for a in mushrooms_group:
+            if pygame.sprite.collide_mask(self, a):
+                a.hp -= self.damage
                 self.speed_x = 0
                 self.speed_y = 0
                 self.sound_of_explosion.play()
                 self.explosion = True
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
+        self.distance += max(abs(self.speed_x), abs(self.speed_y))
 
     def animate_explosion(self):
         self.explosion_frame += 0.4

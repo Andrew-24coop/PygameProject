@@ -1,14 +1,17 @@
+import pygame
+from pygame import font
+
+from random import randint
+
 from worldgen import World
 from settings import *
-from person import *
 from player_status import *
 from Final_boss import Dragon
 from Portal import Portal
 from person import *
-import pygame
-from cow import *
-from random import randint
+from mob import *
 from death_window import Death_window
+from mushroom import *
 
 #pygame.mixer.pre_init(44100, -16, 11, 512)
 
@@ -23,7 +26,12 @@ def draw_grid(screen, zoom=1, offset=(0, 0)):
 
 
 def main():
+    # del menu.button1
+    # del menu.button2
+    # del menu.button3
+    # del menu
     pygame.init()
+    font.init()
     pygame.display.set_caption("Rise of Empire")
     pygame.mixer.music.stop()
     screen = pygame.display.set_mode(SIZE)
@@ -38,25 +46,27 @@ def main():
     current_world = main_world
 
     player = Main_hero(500, 300, WIDTH, HEIGHT)
-    # mushroom = Mushroom(player, 100, 100, WIDTH, HEIGHT)
-    # targets.add(mushroom)
+    mushrooms = Mushrooom_group()
 
-    # portal = Portal(randint(1, 5000), randint(1, 5000),
-    #                 player, targets, main_world, boss_world)
-    portal = Portal(600, 600,
-                    player, targets, main_world, boss_world)
+    portal = Portal(randint(0, 10000), randint(0, 10000),
+                    player, main_world, boss_world)
     death_window = Death_window(screen)
-    boss = Dragon(player, 300, 300, WIDTH, HEIGHT)
+    boss = Dragon(player, randint(300, 1500), randint(300, 1500), WIDTH, HEIGHT)
     dragon.add(boss)
-    # корова в качестве примера
-    cow = Cow(player, 100, 0, WIDTH, HEIGHT, "cow", 20)
-    targets.add(cow)
+
+    cows = Mob_group("cow", player, mobs)
+    pigs = Mob_group("pig", player, mobs)
+    pigs.spawn(10)
+    cows.spawn(10)
 
     zoom = 1
     zoom_chunk = None
     offset = (0, 0)
     prev_chunk = None
 
+    fps_font = font.Font("fonts/Anta-Regular.ttf", 20)
+    coords_font = font.Font("fonts/Anta-Regular.ttf", 20)
+    portal_coords_font = font.Font("fonts/Anta-Regular.ttf", 20)
     def draw_world(world, dx=0, dy=0):
         screen.fill((0, 0, 0))
         if zoom == 1:
@@ -90,6 +100,23 @@ def main():
                             ),
                         )
             screen.blit(player.image, player.rect)
+
+    def calibration_of_coordinates(object):
+        x = object.rect.x + offset[0]
+        y = object.rect.y + offset[1]
+        while x < -480:
+            object.rect.x += 10
+            x = object.rect.x + offset[0]
+        while x > 21480:
+            object.rect.x -= 10
+            x = object.rect.x + offset[0]
+        while y < -275:
+            object.rect.x += 10
+            y = object.rect.y + offset[1]
+        while y > 12870:
+            object.rect.y -= 10
+            y = object.rect.y + offset[1]
+        return (x - 300, y - 300)
 
     running = True
 
@@ -135,10 +162,18 @@ def main():
                     player.moving_frame = 2
             player.check_keyboard()
             if zoom > 1:
+                if portal.change_coords:
+                    portal.change_coords = False
+                    x, y = calibration_of_coordinates(portal)
+                    portal.coords = [x, y]
+
                 player_dx, player_dy = player.map_offset[0], player.map_offset[1]
                 map_dx, map_dy = player.map_offset[2], player.map_offset[3]
                 if -480 < offset[0] + player_dx < 21480 and -275 < offset[1] + player_dy < 12870:
                     offset = (offset[0] + player_dx, offset[1] + player_dy)
+                    player.stop_map = False
+                else:
+                    player.stop_map = True
                 draw_world(current_world, dx=map_dx, dy=map_dy)
 
             if zoom == 1:
@@ -153,19 +188,33 @@ def main():
                     draw_grid(screen)
                     prev_chunk = current_chunk
             else:
-                portal.animation()
-                # if "mushroom" in locals():
-                #     mushroom.movement()
-                #     if mushroom.end:
-                #         targets.remove(mushroom)
-                #         del mushroom
+                portal.animation(screen)
                 targets.draw(screen)
                 if current_world == boss_world:
+                    boss.is_showing = True
                     boss.movement()
-                    dragon.draw(screen)
+                    #boss.breath_sound.play()
+                    boss.draw(screen)
+                    if boss.spawn_mushrooms:
+                        mushrooms.spawn(randint(1, 15), [boss.rect.x, boss.rect.y], player, current_world, mushrooms_group)
+                        boss.hp -= 1
+                        boss.spawn_mushrooms = False
+                    mushrooms.move(screen, mushrooms_group)
+                else:
+                    boss.is_showing = False
+                    cows.move(screen)
+                    pigs.move(screen)
                 lightning_sprite.draw(screen)
                 current_world = portal.worlds[portal.current_world]
                 player.bars.draw(screen, player.hp, player.food, player.energy, player.protection)
+                fps_text = fps_font.render(f"FPS: {round(clock.get_fps(), 1)} / 60", True, (152, 26, 26))
+                screen.blit(fps_text, (840, 7))
+                coords_text = coords_font.render(f"Coords: {offset[0] + player.map_offset[0]}; {offset[1] + player.map_offset[1]}",
+                                                 True, (152, 26, 26))
+                screen.blit(coords_text, (790, 28))
+
+                portal_coords_text = portal_coords_font.render(f"Portal Coords: {portal.coords[0]}; {portal.coords[1]}", True, (152, 26, 26))
+                screen.blit(portal_coords_text, (730, 50))
         if death_window.running == False:
             running = False
         if death_window.reborn:

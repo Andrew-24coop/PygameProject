@@ -1,7 +1,10 @@
 import pygame
 import numpy as np
+from random import randint
+from settings import *
+
 class Mushroom(pygame.sprite.Sprite):
-    def __init__(self, target, x, y, width, height):
+    def __init__(self, target, world, speed, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
         self.image = pygame.image.load("img/Mushroom_sprites/Run/left_mushroom_stop.png").convert_alpha()
@@ -13,8 +16,12 @@ class Mushroom(pygame.sprite.Sprite):
         self.target = target
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.world = world
+
         self.make_image_lists()
         self.make_variables()
+
+        self.speed = speed
 
     def make_image_lists(self):
         self.left_run_sprites = [pygame.image.load(f"img/Mushroom_sprites/Run/left_mushroom_run_{i}.png").convert_alpha() for i in range(1, 9)]
@@ -47,40 +54,42 @@ class Mushroom(pygame.sprite.Sprite):
 
         self.sound_of_hit = pygame.mixer.Sound("sounds/udar-priglushennyiy-reshitelnyiy (mp3cut.net).mp3")
 
+        self.ready = False
+
 
     def determine_direction(self):
         if self.rect.x < self.target.rect.x:
             self.attack = False
             self.direction = "RIGHT"
             if self.rect.y < self.target.rect.y:
-                self.speed_x = 2
-                self.speed_y = 2
+                self.speed_x = self.speed
+                self.speed_y = self.speed
             elif self.rect.y > self.target.rect.y:
-                self.speed_x = 2
-                self.speed_y = -2
+                self.speed_x = self.speed
+                self.speed_y = -self.speed
             if abs(self.rect.y - self.target.rect.y) <= 5:
-                self.speed_x = 2
+                self.speed_x = self.speed
                 self.speed_y = 0
 
         elif self.rect.x > self.target.rect.x:
             self.attack = False
             self.direction = "LEFT"
             if self.rect.y < self.target.rect.y:
-                self.speed_x = -2
-                self.speed_y = 2
+                self.speed_x = -self.speed
+                self.speed_y = self.speed
             elif self.rect.y > self.target.rect.y:
-                self.speed_x = -2
-                self.speed_y = -2
+                self.speed_x = -self.speed
+                self.speed_y = -self.speed
             if abs(self.rect.y - self.target.rect.y) <= 5:
-                self.speed_x = -2
-                self.speed_y = 0
+                self.speed_x = -self.speed
+                self.speed_y = self.speed
         if abs(self.rect.x - self.target.rect.x) <= 5:
             if self.rect.y < self.target.rect.y:
                 self.speed_x = 0
-                self.speed_y = 2
+                self.speed_y = self.speed
             elif self.rect.y > self.target.rect.y:
                 self.speed_x = 0
-                self.speed_y = -2
+                self.speed_y = -self.speed
             if abs(self.rect.y - self.target.rect.y) <= 5:
                 self.attack = True
                 self.speed_x = 0
@@ -94,18 +103,19 @@ class Mushroom(pygame.sprite.Sprite):
             self.is_hit = True
 
     def movement(self):
-        self.determine_direction()
-        self.check_hit()
-        if self.die:
-            self.animate_death()
-        elif self.attack:
-            self.animate_attack()
-        else:
-            self.put_sprites()
-            self.rect.x += self.speed_x
-            self.rect.y += self.speed_y
-        self.rect.x -= self.target.map_offset[0]
-        self.rect.y -= self.target.map_offset[1]
+        if self.ready:
+            self.determine_direction()
+            self.check_hit()
+            if self.die:
+                self.animate_death()
+            elif self.attack:
+                self.animate_attack()
+            else:
+                self.put_sprites()
+                self.rect.x += self.speed_x
+                self.rect.y += self.speed_y
+            self.rect.x -= self.target.map_offset[0]
+            self.rect.y -= self.target.map_offset[1]
 
     def put_sprites(self):
         if self.direction == "LEFT":
@@ -191,6 +201,30 @@ class Mushroom(pygame.sprite.Sprite):
         red_filtered[:, :, 2] = 0  # Убираем синий канал
 
         return pygame.surfarray.make_surface(red_filtered)
+
+
+class Mushrooom_group:
+    def __init__(self):
+        self.mushrooms = []
+
+    def spawn(self, n, boss_coords, player, current_world, group):
+        for i in range(n):
+            mushroom = Mushroom(player, current_world, randint(1, 5), randint(boss_coords[0] - 50, boss_coords[0] + 50),
+                                randint(boss_coords[1] - 50, boss_coords[1] + 50), WIDTH, HEIGHT)
+            self.mushrooms.append(mushroom)
+            group.add(mushroom)
+    def move(self, screen, group):
+        for mushroom in self.mushrooms:
+            mushroom.ready = True
+            mushroom.movement()
+            screen.blit(mushroom.image, mushroom.rect)
+            if mushroom.end:
+                self.mushrooms.remove(mushroom)
+                group.remove(mushroom)
+                del mushroom
+
+
+
 
 
 

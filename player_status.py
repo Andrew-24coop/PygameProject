@@ -28,7 +28,7 @@ class Bars(pygame.sprite.Sprite):
         self.sound = True
 
     def draw(self, screen, health, food, energy, protection):
-        self.health_bar = self.health_bar_sprites[int(health)]
+        self.health_bar = self.health_bar_sprites[int(round(health, 0))]
         screen.blit(self.health_bar, self.health_rect)
 
         self.food_bar = self.food_bar_sprites[food]
