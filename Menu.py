@@ -54,9 +54,9 @@ class Menu:
         pygame.time.wait(100)
         #self.show_game = True
         print("INTO")
-        del self.button1
-        del self.button2
-        del self.button3
+        self.button1.hide()
+        self.button2.hide()
+        self.button3.hide()
         main()
         #self.refer.showing_refer = False
 
