@@ -7,6 +7,9 @@ from pygame_widgets.button import Button
 
 from settings import *
 
+
+
+
 class Death_window(pygame.sprite.Sprite):
     def __init__(self, screen):
         super().__init__()

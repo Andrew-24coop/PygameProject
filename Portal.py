@@ -5,6 +5,8 @@ class Portal(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load("img/Portal/portal_0.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
+        self.start_x_coord = x
+        self.start_y_coord = y
         self.mask = pygame.mask.from_surface(self.image)
 
         self.worlds = [main_world, other_world]

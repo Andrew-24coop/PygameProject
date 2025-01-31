@@ -48,10 +48,10 @@ def main():
     player = Main_hero(500, 300, WIDTH, HEIGHT)
     mushrooms = Mushrooom_group()
 
-    portal = Portal(randint(0, 10000), randint(0, 10000),
+    portal = Portal(randint(-2500, 2500), randint(-2500, 2500),
                     player, main_world, boss_world)
     death_window = Death_window(screen)
-    boss = Dragon(player, randint(300, 1500), randint(300, 1500), WIDTH, HEIGHT)
+    boss = Dragon(player, randint(300, 1000), randint(300, 1000), WIDTH, HEIGHT)
     dragon.add(boss)
 
     cows = Mob_group("cow", player, mobs)
@@ -137,6 +137,8 @@ def main():
                         offset = (0, 0)
                         prev_chunk = None
                         draw_world(current_world)
+                        portal.rect.x = portal.start_x_coord - player.map_offset[2]
+                        portal.rect.y = portal.start_y_coord - player.map_offset[3]
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if zoom == 1:
@@ -153,7 +155,6 @@ def main():
                                 center_x * zoom - WIDTH // 2,
                                 center_y * zoom - HEIGHT // 2,
                             )
-
                             prev_chunk = None
                             draw_world(current_world)
                 elif event.type == pygame.KEYUP:

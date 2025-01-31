@@ -53,6 +53,7 @@ class Menu:
         self.running = False
         pygame.time.wait(100)
         #self.show_game = True
+        print("INTO")
         del self.button1
         del self.button2
         del self.button3
@@ -149,6 +150,7 @@ class Menu:
             pygame.display.update()
             clock.tick(FPS)
         pygame.quit()
+
 if __name__ == "__main__":
     menu = Menu()
     menu.Game()

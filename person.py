@@ -158,7 +158,7 @@ class Main_hero(pygame.sprite.Sprite):
             self.put_sprites()
 
         self.time = int(pygame.time.get_ticks() / 1000)
-        if self.time % 2 == 0:
+        if self.time % 60 == 0:
             if self.change_food:
                 self.food -= 1
                 if self.food < 0:
