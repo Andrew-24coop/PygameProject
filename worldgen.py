@@ -6,6 +6,13 @@ from settings import *
 
 class World:
     def __init__(self, width, height, seed, colors):
+        """
+
+        :param width:
+        :param height:
+        :param seed:
+        :param colors:
+        """
         self.width = width
         self.height = height
         self.seed = seed
@@ -49,14 +56,15 @@ class World:
         else:
             return self.colors["mountain"]
 
-    def lighten_color(self, color, factor=1.2):
-        return tuple(min(int(c * factor), 255) for c in color)
-
     def draw_chunk(self, screen, chunk_x, chunk_y, highlight=False):
         for x in range(chunk_x, min(chunk_x + CHUNK_SIZE, self.width)):
             for y in range(chunk_y, min(chunk_y + CHUNK_SIZE, self.height)):
                 height_value = self.world_map[y, x]
                 color = self.get_terrain_color(height_value)
                 if highlight:
-                    color = self.lighten_color(color)
+                    color = lighten_color(color)
                 pygame.draw.rect(screen, color, (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+
+
+def lighten_color(color, factor=1.2):
+    return tuple(min(int(c * factor), 255) for c in color)

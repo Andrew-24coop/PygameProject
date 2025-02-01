@@ -4,7 +4,7 @@ from pygame import font
 from settings import *
 
 
-class Refer_background(pygame.sprite.Sprite):
+class ReferBackground(pygame.sprite.Sprite):
     def __init__(self):
         pygame.init()
         super().__init__()
@@ -13,15 +13,18 @@ class Refer_background(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
         self.frame = 0
-        self.background_sprites = [pygame.image.load(f"img/Main_menu_background/Refer_background/{i}.jpeg") for i in range(1, 9)]
+        self.background_sprites = [pygame.image.load(f"img/Main_menu_background/Refer_background/{i}.jpeg")
+                                   for i in range(1, 9)]
 
     def change_sprite(self):
         self.frame += 0.1
         if self.frame > 7.8:
             self.frame = 0
         self.image = self.background_sprites[int(self.frame)]
-class Refer():
-    def __init__(self, menu):
+
+
+class Refer:
+    def __init__(self):
         font.init()
         self.screen = pygame.display.set_mode(SIZE)
 
@@ -31,8 +34,9 @@ class Refer():
         with open("refer", 'r', encoding="utf-8") as refer:
             self.text = refer.readlines()
 
-        self.background = Refer_background()
+        self.background = ReferBackground()
         self.showing_refer = False
+
     def draw_text(self, screen):
         for line in self.text:
             line = line.strip()
@@ -42,6 +46,7 @@ class Refer():
             screen.blit(text, (20, self.coefficient))
             self.coefficient += 20
         self.coefficient = 10
+
     def show_refer(self, screen):
         pygame.init()
 
@@ -49,5 +54,3 @@ class Refer():
         self.background.change_sprite()
         screen.blit(self.background.image, self.background.rect)
         self.draw_text(screen)
-
-

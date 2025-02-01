@@ -1,5 +1,6 @@
 import pygame
 
+
 class Bars(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -14,17 +15,17 @@ class Bars(pygame.sprite.Sprite):
         self.energy_rect = self.energy_bar.get_rect(center=(x, y + 30))
         self.protection_rect = self.protection_bar.get_rect(center=(x, y + 45))
 
-
         self.health_bar_sprites = [pygame.image.load(f"img/Bars/Health/health_bar_{i}.png").convert_alpha()
                                    for i in range(6)]
         self.food_bar_sprites = [pygame.image.load(f"img/Bars/Food/food_bar_{i}.png").convert_alpha()
-                                   for i in range(6)]
+                                 for i in range(6)]
         self.energy_bar_sprites = [pygame.image.load(f"img/Bars/Energy/energy_bar_{i}.png").convert_alpha()
                                    for i in range(6)]
         self.protection_bar_sprites = [pygame.image.load(f"img/Bars/Protection/protection_bar_{i}.png").convert_alpha()
-                                   for i in range(6)]
+                                       for i in range(6)]
 
-        self.sound_of_energy = pygame.mixer.Sound("sounds/korotkie-spetseffektyi-nakopleniya-energii-40430 (mp3cut.net).mp3")
+        self.sound_of_energy = pygame.mixer.Sound(
+            "sounds/korotkie-spetseffektyi-nakopleniya-energii-40430 (mp3cut.net).mp3")
         self.sound = True
 
     def draw(self, screen, health, food, energy, protection):
@@ -42,9 +43,9 @@ class Bars(pygame.sprite.Sprite):
         if energy < 5:
             self.sound = True
 
-
         self.protection_bar = self.protection_bar_sprites[protection]
         screen.blit(self.protection_bar, self.protection_rect)
+
 
 class Hearts(pygame.sprite.Sprite):
     def __init__(self, x, y, player, all_sprites):
@@ -61,6 +62,7 @@ class Hearts(pygame.sprite.Sprite):
         self.player = player
         self.group = all_sprites
         self.group.add(self)
+
     def animation(self):
         self.check_collision()
         self.frame += 0.2
@@ -75,5 +77,3 @@ class Hearts(pygame.sprite.Sprite):
                 if self.player.hp > 5:
                     self.player.hp = 5
                 self.group.remove(self)
-
-

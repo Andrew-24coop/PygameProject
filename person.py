@@ -1,8 +1,4 @@
-import pygame
 import numpy as np
-
-from settings import *
-from mushroom import Mushroom
 from player_status import *
 
 targets = pygame.sprite.Group()
@@ -11,7 +7,9 @@ lightning_sprite = pygame.sprite.Group()
 mushrooms_group = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
 portal_sprite = pygame.sprite.Group()
-class Main_hero(pygame.sprite.Sprite):
+
+
+class MainHero(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
@@ -25,9 +23,6 @@ class Main_hero(pygame.sprite.Sprite):
         self.lightning = Lightning(self, x, y, width, height)
         self.bars = Bars(30, 10)
 
-        self.make_variables()
-
-    def make_variables(self):
         self.hp = 5
         self.damage = 1
         self.protection = 0
@@ -66,7 +61,6 @@ class Main_hero(pygame.sprite.Sprite):
 
         self.map_offset = []
         self.stop_map = False
-        self.make_images_lists()
 
         self.sword_miss_sound = pygame.mixer.Sound("sounds/promah-pri-boe-na-mechah.mp3")
         self.sword_hit_sound = pygame.mixer.Sound("sounds/nasajivayuschiy-pronikayuschiy-udar.mp3")
@@ -81,35 +75,35 @@ class Main_hero(pygame.sprite.Sprite):
         self.time = 0
         self.change_food = True
 
-    def make_images_lists(self):
+        self.total_offset = None
+
         self.right_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha(),
                                       pygame.image.load('img/Main_hero_sprites/sprite_8.png').convert_alpha(),
                                       pygame.image.load('img/Main_hero_sprites/sprite_10.png').convert_alpha()]
         self.left_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_7.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_9.png').convert_alpha()]
+                                     pygame.image.load('img/Main_hero_sprites/sprite_7.png').convert_alpha(),
+                                     pygame.image.load('img/Main_hero_sprites/sprite_9.png').convert_alpha()]
         self.up_moving_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_3.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_11.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_12.png').convert_alpha()]
+                                   pygame.image.load('img/Main_hero_sprites/sprite_11.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_12.png').convert_alpha()]
         self.down_moving_pictures = [pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_6.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_5.png').convert_alpha()]
+                                     pygame.image.load('img/Main_hero_sprites/sprite_6.png').convert_alpha(),
+                                     pygame.image.load('img/Main_hero_sprites/sprite_5.png').convert_alpha()]
         self.down_stop_pictures = [pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_14.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha()]
+                                   pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_14.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_13.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/main_sprite.png').convert_alpha()]
         self.left_stop_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_16.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha()]
+                                   pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_16.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_15.png').convert_alpha(),
+                                   pygame.image.load('img/Main_hero_sprites/sprite_2.png').convert_alpha()]
         self.right_stop_pictures = [pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_18.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
-                                      pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha()]
-
+                                    pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
+                                    pygame.image.load('img/Main_hero_sprites/sprite_18.png').convert_alpha(),
+                                    pygame.image.load('img/Main_hero_sprites/sprite_17.png').convert_alpha(),
+                                    pygame.image.load('img/Main_hero_sprites/sprite_4.png').convert_alpha()]
 
     def movement(self):
         if self.fast_moving:
@@ -118,15 +112,14 @@ class Main_hero(pygame.sprite.Sprite):
             elif self.direction == "UP" or self.direction == "DOWN":
                 self.pos_y = self.pos_y * 2
 
-        #self.rect.x += self.pos_x
-        #self.rect.y += self.pos_y
+        # self.rect.x += self.pos_x
+        # self.rect.y += self.pos_y
 
         if not self.stop_map:
             self.dx += self.pos_x / 22
             self.dy += self.pos_y / 22
 
         self.map_offset = [self.pos_x, self.pos_y, int(self.dx), int(self.dy)]
-
 
         if self.lightning_attack:
             if self.lightning.explosion:
@@ -171,47 +164,46 @@ class Main_hero(pygame.sprite.Sprite):
         # if self.hp <= 0:
         #     main_hero_sprite.remove(self)
 
-
     def put_sprites(self):
-            coefficient = 0.2
-            low_coefficient = 0.3
-            if self.fast_moving:
-                coefficient = 0.3
-            if self.is_move:
-                self.blink = 0
+        coefficient = 0.2
+        low_coefficient = 0.3
+        if self.fast_moving:
+            coefficient = 0.3
+        if self.is_move:
+            self.blink = 0
+            self.stop_frame = 0
+            self.moving_frame += coefficient
+            if self.moving_frame > 3:
+                self.moving_frame = 0
+            self.play_walking_sound()
+            if self.direction == "RIGHT":
+                self.image = self.right_moving_pictures[int(self.moving_frame)]
+            elif self.direction == "LEFT":
+                self.image = self.left_moving_pictures[int(self.moving_frame)]
+            elif self.direction == "UP":
+                self.image = self.up_moving_pictures[int(self.moving_frame)]
+            elif self.direction == "DOWN":
+                self.image = self.down_moving_pictures[int(self.moving_frame)]
+        else:
+            self.blink += 0.1
+            self.stop_frame += low_coefficient
+            if self.stop_frame > 5:
                 self.stop_frame = 0
-                self.moving_frame += coefficient
-                if self.moving_frame > 3:
-                    self.moving_frame = 0
-                self.play_walking_sound()
+            if 5 < self.blink < 7 or self.blink == 0.1:
                 if self.direction == "RIGHT":
-                    self.image = self.right_moving_pictures[int(self.moving_frame)]
+                    self.image = self.right_stop_pictures[int(self.stop_frame)]
                 elif self.direction == "LEFT":
-                    self.image = self.left_moving_pictures[int(self.moving_frame)]
+                    self.image = self.left_stop_pictures[int(self.stop_frame)]
                 elif self.direction == "UP":
-                    self.image = self.up_moving_pictures[int(self.moving_frame)]
+                    self.image = self.up_moving_pictures[0]
                 elif self.direction == "DOWN":
-                    self.image = self.down_moving_pictures[int(self.moving_frame)]
-            else:
-                self.blink += 0.1
-                self.stop_frame += low_coefficient
-                if self.stop_frame > 5:
-                    self.stop_frame = 0
-                if self.blink > 5 and self.blink < 7 or self.blink == 0.1:
-                    if self.direction == "RIGHT":
-                        self.image = self.right_stop_pictures[int(self.stop_frame)]
-                    elif self.direction == "LEFT":
-                        self.image = self.left_stop_pictures[int(self.stop_frame)]
-                    elif self.direction == "UP":
-                        self.image = self.up_moving_pictures[0]
-                    elif self.direction == "DOWN":
-                        self.image = self.down_stop_pictures[int(self.stop_frame)]
-                elif self.blink > 7:
-                    self.stop_frame = 0
-                    self.blink = 0
-                self.moving_frame = 2
-            # if mushroom.attack:
-            #     self.image = self.apply_red_filter(self.image)
+                    self.image = self.down_stop_pictures[int(self.stop_frame)]
+            elif self.blink > 7:
+                self.stop_frame = 0
+                self.blink = 0
+            self.moving_frame = 2
+        # if mushroom.attack:
+        #     self.image = self.apply_red_filter(self.image)
 
     def play_walking_sound(self):
         if self.sound_delay == 0:
@@ -224,8 +216,6 @@ class Main_hero(pygame.sprite.Sprite):
             self.sound_delay += 0.1
             if self.sound_delay > 0.5:
                 self.sound_delay = 0
-
-
 
     def make_right_true(self):
         self.pos_x = 5
@@ -264,6 +254,7 @@ class Main_hero(pygame.sprite.Sprite):
             self.sword_miss_sound.play()
             # if self.direction == "LEFT":
             #     self.rect.x += 35
+
     def check_keyboard(self):
         key = pygame.key.get_pressed()
 
@@ -298,7 +289,6 @@ class Main_hero(pygame.sprite.Sprite):
                     self.lightning.rect.y = self.rect.y + 20
                     self.lightning.rotate_lightning(self.direction)
 
-
         # Для прыжков
         # if key[pygame.K_SPACE]:
         #     if player.is_on_ground:
@@ -307,15 +297,7 @@ class Main_hero(pygame.sprite.Sprite):
         #         player.is_on_ground = False
         # player.movement(height - player.rect.height)
         self.movement()
-    def apply_red_filter(self, surface):
-        arr = pygame.surfarray.array3d(surface)  # Получаем цветовую составляющую
 
-        # Убираем зеленую и синюю составляющие, оставляя красную
-        red_filtered = np.copy(arr)
-        red_filtered[:, :, 1] = 0  # Убираем зеленый канал
-        red_filtered[:, :, 2] = 0  # Убираем синий канал
-
-        return pygame.surfarray.make_surface(red_filtered)
 
 class Lightning(pygame.sprite.Sprite):
     def __init__(self, parent, x, y, width, height):
@@ -342,7 +324,6 @@ class Lightning(pygame.sprite.Sprite):
         explosion_image_3 = pygame.image.load("img/Attack/lightning_exploding3.png").convert_alpha()
         self.explosion_sprites = [explosion_image_1, explosion_image_2, explosion_image_3]
 
-
         self.explosion_frame = 0
 
         self.speed_x = 0
@@ -361,14 +342,14 @@ class Lightning(pygame.sprite.Sprite):
             self.speed_y = 0
             self.explosion = True
         for i in mobs:
-            if pygame.sprite.collide_mask(self, i) and not i.die:
+            if pygame.sprite.collide_mask(self, i) and not i.die and i.is_showing:
                 i.hp -= self.damage
                 self.speed_x = 0
                 self.speed_y = 0
                 self.sound_of_explosion.play()
                 self.explosion = True
         for j in dragon:
-            if pygame.sprite.collide_mask(self, j) and j.is_showing:
+            if pygame.sprite.collide_mask(self, j) and j.is_showing and not j.die:
                 j.hp -= self.damage
                 self.speed_x = 0
                 self.speed_y = 0
@@ -404,16 +385,11 @@ class Lightning(pygame.sprite.Sprite):
     def rotate_lightning(self, direction):
         self.image = pygame.image.load("img/Attack/lightning.png").convert_alpha()
         self.image = pygame.transform.rotate(self.image,
-                                                       self.rotation[direction][0])
-        #for i in range(3):
+                                             self.rotation[direction][0])
+        # for i in range(3):
         #    self.explosion_sprites[i] = pygame.transform.rotate(self.explosion_sprites[i], self.rotation[direction][0])
         self.speed_x = self.rotation[direction][1]
         self.speed_y = self.rotation[direction][2]
-
-
-
-
-
 
 
 # if __name__ == '__main__':
@@ -447,3 +423,13 @@ class Lightning(pygame.sprite.Sprite):
 #         all_sprites.draw(screen)
 #         pygame.display.flip()
 #         clock.tick(FPS)
+
+def apply_red_filter(surface):
+    arr = pygame.surfarray.array3d(surface)  # Получаем цветовую составляющую
+
+    # Убираем зеленую и синюю составляющие, оставляя красную
+    red_filtered = np.copy(arr)
+    red_filtered[:, :, 1] = 0  # Убираем зеленый канал
+    red_filtered[:, :, 2] = 0  # Убираем синий канал
+
+    return pygame.surfarray.make_surface(red_filtered)

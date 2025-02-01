@@ -3,6 +3,7 @@ import numpy as np
 from random import randint
 from settings import *
 
+
 class Mushroom(pygame.sprite.Sprite):
     def __init__(self, target, world, speed, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
@@ -18,21 +19,6 @@ class Mushroom(pygame.sprite.Sprite):
 
         self.world = world
 
-        self.make_image_lists()
-        self.make_variables()
-
-        self.speed = speed
-
-    def make_image_lists(self):
-        self.left_run_sprites = [pygame.image.load(f"img/Mushroom_sprites/Run/left_mushroom_run_{i}.png").convert_alpha() for i in range(1, 9)]
-        self.right_run_sprites = [pygame.transform.flip(self.left_run_sprites[i], True, False) for i in range(8)]
-        self.right_die_sprites = [pygame.image.load(f"img/Mushroom_sprites/Die/right_mushroom_die_{i}.png").convert_alpha() for i in range(1, 9)]
-        self.left_die_sprite = [pygame.transform.flip(self.right_die_sprites[i], True, False) for i in range(8)]
-        self.right_attack_sprite = [pygame.image.load(f"img/Mushroom_sprites/Attack/right_mushroom_attack_{i}.png").convert_alpha() for i in range(1, 8)]
-        self.left_attack_sprite = [pygame.transform.flip(self.right_attack_sprite[i], True, False) for i in range(7)]
-        self.left_stun_sprites = [pygame.image.load(f"img/Mushroom_sprites/Attack/left_stun_{i}.png").convert_alpha() for i in range(1, 5)]
-        self.right_stun_sprites = [pygame.transform.flip(self.left_stun_sprites[i], True, False) for i in range(4)]
-    def make_variables(self):
         self.hp = 10
         self.speed_x = 0
         self.speed_y = 0
@@ -56,6 +42,23 @@ class Mushroom(pygame.sprite.Sprite):
 
         self.ready = False
 
+        self.speed = speed
+
+        self.left_run_sprites = [
+            pygame.image.load(f"img/Mushroom_sprites/Run/left_mushroom_run_{i}.png").convert_alpha() for i in
+            range(1, 9)]
+        self.right_run_sprites = [pygame.transform.flip(self.left_run_sprites[i], True, False) for i in range(8)]
+        self.right_die_sprites = [
+            pygame.image.load(f"img/Mushroom_sprites/Die/right_mushroom_die_{i}.png").convert_alpha() for i in
+            range(1, 9)]
+        self.left_die_sprite = [pygame.transform.flip(self.right_die_sprites[i], True, False) for i in range(8)]
+        self.right_attack_sprite = [
+            pygame.image.load(f"img/Mushroom_sprites/Attack/right_mushroom_attack_{i}.png").convert_alpha() for i in
+            range(1, 8)]
+        self.left_attack_sprite = [pygame.transform.flip(self.right_attack_sprite[i], True, False) for i in range(7)]
+        self.left_stun_sprites = [pygame.image.load(f"img/Mushroom_sprites/Attack/left_stun_{i}.png").convert_alpha()
+                                  for i in range(1, 5)]
+        self.right_stun_sprites = [pygame.transform.flip(self.left_stun_sprites[i], True, False) for i in range(4)]
 
     def determine_direction(self):
         if self.rect.x < self.target.rect.x:
@@ -95,9 +98,9 @@ class Mushroom(pygame.sprite.Sprite):
                 self.speed_x = 0
                 self.speed_y = 0
         elif abs(self.rect.x - self.target.rect.x) <= 30 and abs(self.rect.y - self.target.rect.y) <= 5:
-                self.attack = True
-                self.speed_x = 0
-                self.speed_y = 0
+            self.attack = True
+            self.speed_x = 0
+            self.speed_y = 0
 
         if abs(self.rect.x - self.target.rect.x) <= 40 and abs(self.rect.y - self.target.rect.y) <= 20:
             self.is_hit = True
@@ -136,12 +139,12 @@ class Mushroom(pygame.sprite.Sprite):
         if self.death_frame > 7:
             coefficient = 0.01
         self.death_frame += coefficient
-        if self.death_frame > 0.6 and self.death_frame < 3:
+        if 0.6 < self.death_frame < 3:
             if self.direction == "LEFT":
                 self.rect.x += 1
             else:
                 self.rect.x -= 1
-        elif self.death_frame > 3 and self.death_frame < 4:
+        elif 3 < self.death_frame < 4:
             if self.direction == "LEFT":
                 self.rect.x -= 2
             else:
@@ -159,7 +162,6 @@ class Mushroom(pygame.sprite.Sprite):
         self.attack_frame += 0.4
         if self.attack_frame > 6.4:
             self.attack = False
-            self.stun = True
             self.attack_frame = 0
             self.target.hp -= 0.4
         if self.attack_frame < 3.2:
@@ -188,19 +190,9 @@ class Mushroom(pygame.sprite.Sprite):
             self.target.energy += 1
             if self.target.energy > 5:
                 self.target.energy = 5
-            self.image = self.apply_red_filter(self.image)
+            self.image = apply_red_filter(self.image)
         if self.hp <= 0:
             self.die = True
-
-    def apply_red_filter(self, surface):
-        arr = pygame.surfarray.array3d(surface)  # Получаем цветовую составляющую
-
-        # Убираем зеленую и синюю составляющие, оставляя красную
-        red_filtered = np.copy(arr)
-        red_filtered[:, :, 1] = 0  # Убираем зеленый канал
-        red_filtered[:, :, 2] = 0  # Убираем синий канал
-
-        return pygame.surfarray.make_surface(red_filtered)
 
 
 class Mushrooom_group:
@@ -213,6 +205,7 @@ class Mushrooom_group:
                                 randint(boss_coords[1] - 50, boss_coords[1] + 50), WIDTH, HEIGHT)
             self.mushrooms.append(mushroom)
             group.add(mushroom)
+
     def move(self, screen, group):
         for mushroom in self.mushrooms:
             mushroom.ready = True
@@ -223,12 +216,12 @@ class Mushrooom_group:
                 group.remove(mushroom)
                 del mushroom
 
+def apply_red_filter(surface):
+    arr = pygame.surfarray.array3d(surface)  # Получаем цветовую составляющую
 
+    # Убираем зеленую и синюю составляющие, оставляя красную
+    red_filtered = np.copy(arr)
+    red_filtered[:, :, 1] = 0  # Убираем зеленый канал
+    red_filtered[:, :, 2] = 0  # Убираем синий канал
 
-
-
-
-
-
-
-
+    return pygame.surfarray.make_surface(red_filtered)

@@ -1,17 +1,11 @@
-import pygame
-
-from pygame import font
 import pygame_widgets
 from pygame_widgets.button import Button
-
-
 from main import main
-
-from settings import *
 from Refer import *
-
 from random import choice
-class Main_background(pygame.sprite.Sprite):
+
+
+class MainBackground(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("img/Main_menu_background/menu_background.png")
@@ -20,6 +14,7 @@ class Main_background(pygame.sprite.Sprite):
         self.rect.y = 0
         self.coefficient = 1
         self.delay = 0
+
     def movement(self):
         self.delay += 1
         if self.delay == 3:
@@ -28,62 +23,35 @@ class Main_background(pygame.sprite.Sprite):
                 self.coefficient = -self.coefficient
             self.rect.x += self.coefficient
 
+
 class Menu:
     def __init__(self):
         self.screen = pygame.display.set_mode(SIZE)
         font.init()
-        self.background = Main_background()
+        self.background = MainBackground()
         self.title = font.Font("fonts/PixelifySans-SemiBold.ttf", 100)
         self.title = self.title.render("Rise of Empire", True, (200, 201, 8))
         self.refer = Refer(self)
         self.running = True
 
-        #self.game = Game()
-        #self.show_game = False
+        # self.game = Game()
+        # self.show_game = False
+        self.show_game = None
 
         self.button_click_sound = pygame.mixer.Sound("sounds/knopka-vyiklyuchatelya1.mp3")
 
-    def showing_refer(self):
-        self.button_click_sound.play()
-        self.refer.showing_refer = True
-        self.show_game = False
+        self.button1 = Button(self.screen, 385, 150, 200, 80,
 
-    def make_game_true(self):
-        self.button_click_sound.play()
-        self.running = False
-        pygame.time.wait(100)
-        #self.show_game = True
-        print("INTO")
-        self.button1.hide()
-        self.button2.hide()
-        self.button3.hide()
-        main()
-        #self.refer.showing_refer = False
-
-    def exit(self):
-        self.button_click_sound.play()
-        pygame.time.wait(1000)
-        self.running = False
-
-    def Game(self):
-        self.button1 = Button(
-            # Mandatory Parameters
-            self.screen,  # Surface to place button on
-            385,  # X-coordinate of top left corner
-            150,  # Y-coordinate of top left corner
-            200,  # Width
-            80,  # Height
-
-            # Optional Parameters
-            text='Играть',  # Text to display
-            fontSize=50,  # Size of font
-            margin=20,  # Minimum distance between text/image and edge of button
-            inactiveColour=(248, 237, 176),  # Colour of button when not being interacted with
-            hoverColour=(252, 227, 88),  # Colour of button when being hovered over
-            pressedColour=(236, 180, 8),  # Colour of button when being clicked
-            radius=5,  # Radius of border corners (leave empty for not curved)
-            onClick=lambda: self.make_game_true()  # Function to call when clicked on
-        )
+                              # Optional Parameters
+                              text='Играть',  # Text to display
+                              fontSize=50,  # Size of font
+                              margin=20,  # Minimum distance between text/image and edge of button
+                              inactiveColour=(248, 237, 176),  # Colour of button when not being interacted with
+                              hoverColour=(252, 227, 88),  # Colour of button when being hovered over
+                              pressedColour=(236, 180, 8),  # Colour of button when being clicked
+                              radius=5,  # Radius of border corners (leave empty for not curved)
+                              onClick=lambda: self.make_game_true()  # Function to call when clicked on
+                              )
         self.button2 = Button(
             # Mandatory Parameters
             self.screen,  # Surface to place button on
@@ -120,6 +88,30 @@ class Menu:
             radius=5,  # Radius of border corners (leave empty for not curved)
             onClick=lambda: self.exit()  # Function to call when clicked on
         )
+
+    def showing_refer(self):
+        self.button_click_sound.play()
+        self.refer.showing_refer = True
+        self.show_game = False
+
+    def make_game_true(self):
+        self.button_click_sound.play()
+        self.running = False
+        pygame.time.wait(100)
+        # self.show_game = True
+        print("INTO")
+        self.button1.hide()
+        self.button2.hide()
+        self.button3.hide()
+        main()
+        # self.refer.showing_refer = False
+
+    def exit(self):
+        self.button_click_sound.play()
+        pygame.time.wait(1000)
+        self.running = False
+
+    def game(self):
         pygame.init()
         pygame.display.set_caption("Rise of Empire")
         clock = pygame.time.Clock()
@@ -134,9 +126,9 @@ class Menu:
                 if event.type == pygame.QUIT:
                     self.running = False
             if keys[pygame.K_ESCAPE] and self.refer.showing_refer:
-               self.button_click_sound.play()
-               pygame.time.wait(50)
-               self.refer.showing_refer = False
+                self.button_click_sound.play()
+                pygame.time.wait(50)
+                self.refer.showing_refer = False
             if self.refer.showing_refer:
                 self.refer.show_refer(self.screen)
             # elif self.show_game:
@@ -151,6 +143,7 @@ class Menu:
             clock.tick(FPS)
         pygame.quit()
 
+
 if __name__ == "__main__":
     menu = Menu()
-    menu.Game()
+    menu.game()

@@ -1,16 +1,9 @@
-import sys
-
 import pygame
-
 import pygame_widgets
 from pygame_widgets.button import Button
 
-from settings import *
 
-
-
-
-class Death_window(pygame.sprite.Sprite):
+class DeathWindow(pygame.sprite.Sprite):
     def __init__(self, screen):
         super().__init__()
         self.screen = screen
@@ -22,17 +15,6 @@ class Death_window(pygame.sprite.Sprite):
 
         self.button_click_sound = pygame.mixer.Sound("sounds/knopka-vyiklyuchatelya1.mp3")
 
-    def exit(self):
-        self.button_click_sound.play()
-        pygame.time.wait(1000)
-        self.running = False
-
-    def make_reborn_true(self):
-        self.button_click_sound.play()
-        pygame.time.wait(1000)
-        self.reborn = True
-
-    def show(self):
         self.button1 = Button(
             # Mandatory Parameters
             self.screen,  # Surface to place button on
@@ -69,6 +51,18 @@ class Death_window(pygame.sprite.Sprite):
             radius=5,  # Radius of border corners (leave empty for not curved)
             onClick=lambda: self.exit()  # Function to call when clicked on
         )
+
+    def exit(self):
+        self.button_click_sound.play()
+        pygame.time.wait(1000)
+        self.running = False
+
+    def make_reborn_true(self):
+        self.button_click_sound.play()
+        pygame.time.wait(1000)
+        self.reborn = True
+
+    def show(self):
         self.screen.fill((152, 26, 26))
         self.screen.blit(self.death_picture, self.picture_rect)
         events = pygame.event.get()
@@ -77,5 +71,3 @@ class Death_window(pygame.sprite.Sprite):
                 self.running = False
         pygame_widgets.update(events)
         pygame.display.update()
-
-

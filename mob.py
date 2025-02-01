@@ -24,7 +24,9 @@ class Mob(pygame.sprite.Sprite):
 
         self.die = False
 
-        self.actions = {"stop": lambda: self.animate_stop(), "move": lambda: self.animate_move(), "eat": lambda: self.animate_eat()}
+        self.actions = {"stop": lambda: self.animate_stop(),
+                        "move": lambda: self.animate_move(),
+                        "eat": lambda: self.animate_eat()}
         self.current_action = None
 
         self.eat_frame = 0
@@ -35,6 +37,27 @@ class Mob(pygame.sprite.Sprite):
 
         self.delay = 0
         self.hit_delay = 0
+
+        self.is_showing = True
+
+        self.image = None
+        self.rect = None
+
+        self.right_walk_sprites = None
+        self.left_walk_sprites = None
+
+        self.right_eat_sprites = None
+        self.left_eat_sprites = None
+
+        self.mask = None
+
+        self.hp = None
+
+        self.food = None
+
+        self.death_sound = None
+        self.hurt_sound = None
+
     def make_cow(self, x, y):
         self.image = pygame.image.load("img/Mobs/Cow/cow_1.png").convert_alpha()
         self.rect = self.image.get_rect(center=(x, y))
@@ -42,7 +65,8 @@ class Mob(pygame.sprite.Sprite):
         self.right_walk_sprites = [pygame.image.load(f"img/Mobs/Cow/cow_{i}.png").convert_alpha() for i in range(1, 9)]
         self.left_walk_sprites = [pygame.transform.flip(i, True, False) for i in self.right_walk_sprites]
 
-        self.right_eat_sprites = [pygame.image.load(f"img/Mobs/Cow/cow_eats_{i}.png").convert_alpha() for i in range(1, 3)]
+        self.right_eat_sprites = [pygame.image.load(f"img/Mobs/Cow/cow_eats_{i}.png").convert_alpha() for i in
+                                  range(1, 3)]
         self.left_eat_sprites = [pygame.transform.flip(i, True, False) for i in self.right_eat_sprites]
 
         self.mask = pygame.mask.from_surface(self.image)
@@ -61,7 +85,8 @@ class Mob(pygame.sprite.Sprite):
         self.right_walk_sprites = [pygame.image.load(f"img/Mobs/Pig/pig_{i}.png").convert_alpha() for i in range(1, 10)]
         self.left_walk_sprites = [pygame.transform.flip(i, True, False) for i in self.right_walk_sprites]
 
-        self.right_eat_sprites = [pygame.image.load(f"img/Mobs/Pig/pig_eats_{i}.png").convert_alpha() for i in range(1, 3)]
+        self.right_eat_sprites = [pygame.image.load(f"img/Mobs/Pig/pig_eats_{i}.png").convert_alpha() for i in
+                                  range(1, 3)]
         self.left_eat_sprites = [pygame.transform.flip(i, True, False) for i in self.right_eat_sprites]
 
         self.mask = pygame.mask.from_surface(self.image)
@@ -136,16 +161,7 @@ class Mob(pygame.sprite.Sprite):
             self.hit_delay += 0.2
             if self.hit_delay > 1:
                 self.hit_delay = 0
-            self.image = self.apply_red_filter(self.image)
-
-    def apply_red_filter(self, surface):
-        arr = pygame.surfarray.array3d(surface)
-
-        red_filtered = np.copy(arr)
-        red_filtered[:, :, 1] = 0
-        red_filtered[:, :, 2] = 0
-
-        return pygame.surfarray.make_surface(red_filtered)
+            self.image = apply_red_filter(self.image)
 
     def movement(self):
         if not self.die:
@@ -158,8 +174,9 @@ class Mob(pygame.sprite.Sprite):
                     self.delay = 0
             self.actions[self.current_action]()
             self.check_hit()
-            self.rect.x -= self.player.map_offset[0]
-            self.rect.y -= self.player.map_offset[1]
+            if not self.player.stop_map:
+                self.rect.x -= self.player.map_offset[0]
+                self.rect.y -= self.player.map_offset[1]
             if self.hp < 0:
                 self.die = True
                 self.death_sound.play()
@@ -172,14 +189,22 @@ class Food(pygame.sprite.Sprite):
             self.image = pygame.image.load("img/Mobs/Cow/beef_sprite.png").convert_alpha()
         else:
             self.image = pygame.image.load("img/Mobs/Pig/pork_sprite.png").convert_alpha()
-        self.rect = self.image.get_rect(center=(mob.rect.x + 5, mob.rect.y + 5))
+        self.rect = self.image.get_rect(center=(mob.rect.x, mob.rect.y))
         self.mask = pygame.mask.from_surface(self.image)
+
+        self.mob = mob
 
         self.player = player
         self.end = False
 
         self.eating_sound = pygame.mixer.Sound("sounds/eating_sound.mp3")
+        self.calibrate_coordinates = True
+
     def check_collision(self):
+        if self.calibrate_coordinates:
+            self.rect.x = self.mob.rect.x
+            self.rect.y = self.mob.rect.y
+            self.calibrate_coordinates = False
         self.rect.x -= self.player.map_offset[0]
         self.rect.y -= self.player.map_offset[1]
         if pygame.sprite.collide_mask(self, self.player):
@@ -190,8 +215,7 @@ class Food(pygame.sprite.Sprite):
             self.eating_sound.play()
 
 
-
-class Mob_group:
+class MobGroup:
     def __init__(self, mob, player, group):
         if mob == "cow":
             self.mob = "cow"
@@ -206,10 +230,11 @@ class Mob_group:
 
     def spawn(self, n):
         for i in range(n):
-            mob = Mob(self.player, randint(10, 3000), randint(10, 3000), self.mob)
+            mob = Mob(self.player, randint(-10000, 10000), randint(-10000, 10000), self.mob)
             self.mobs.append(mob)
             self.group.add(mob)
             self.food.append(Food(self.player, mob))
+
     def move(self, screen):
         for i in range(len(self.mobs)):
             self.mobs[i].movement()
@@ -223,4 +248,20 @@ class Mob_group:
             else:
                 screen.blit(self.mobs[i].image, self.mobs[i].rect)
 
+    def make_showing_true(self):
+        for i in self.mobs:
+            i.is_showing = True
 
+    def make_showing_false(self):
+        for i in self.mobs:
+            i.is_showing = False
+
+
+def apply_red_filter(surface):
+    arr = pygame.surfarray.array3d(surface)
+
+    red_filtered = np.copy(arr)
+    red_filtered[:, :, 1] = 0
+    red_filtered[:, :, 2] = 0
+
+    return pygame.surfarray.make_surface(red_filtered)

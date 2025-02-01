@@ -1,5 +1,6 @@
 import pygame
 
+
 class Portal(pygame.sprite.Sprite):
     def __init__(self, x, y, player, main_world, other_world):
         super().__init__()
@@ -22,9 +23,11 @@ class Portal(pygame.sprite.Sprite):
         self.change_coords = True
 
         self.teleportation_sound = pygame.mixer.Sound("sounds/enderman_teleport.mp3")
+
     def animation(self, screen):
-        self.rect.x -= self.player.map_offset[0]
-        self.rect.y -= self.player.map_offset[1]
+        if not self.player.stop_map:
+            self.rect.x -= self.player.map_offset[0]
+            self.rect.y -= self.player.map_offset[1]
         self.check_collision()
         self.sprites_frame += 0.2
         if self.sprites_frame >= 9:
@@ -42,4 +45,3 @@ class Portal(pygame.sprite.Sprite):
             self.delay += 0.1
         if self.delay > 20:
             self.delay = 0
-
