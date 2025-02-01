@@ -172,7 +172,7 @@ class Mushroom(pygame.sprite.Sprite):
         elif self.attack_frame > 3.2:
             if self.attack_frame >= 6:
                 self.sound_of_hit.play()
-            self.target.image = self.target.apply_red_filter(self.target.image)
+            self.target.image = apply_red_filter(self.target.image)
             if self.direction == "LEFT":
                 self.rect.x += 3
             else:

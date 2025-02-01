@@ -31,7 +31,7 @@ class Menu:
         self.background = MainBackground()
         self.title = font.Font("fonts/PixelifySans-SemiBold.ttf", 100)
         self.title = self.title.render("Rise of Empire", True, (200, 201, 8))
-        self.refer = Refer(self)
+        self.refer = Refer()
         self.running = True
 
         # self.game = Game()
@@ -99,7 +99,6 @@ class Menu:
         self.running = False
         pygame.time.wait(100)
         # self.show_game = True
-        print("INTO")
         self.button1.hide()
         self.button2.hide()
         self.button3.hide()
@@ -145,5 +144,8 @@ class Menu:
 
 
 if __name__ == "__main__":
-    menu = Menu()
-    menu.game()
+    try:
+        menu = Menu()
+        menu.game()
+    except:
+        pass

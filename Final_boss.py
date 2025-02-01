@@ -22,7 +22,7 @@ class Dragon(pygame.sprite.Sprite):
         self.speed = 2
         self.dx = 0
 
-        self.hp = 20
+        self.hp = 200
 
         self.delay = 0
 
@@ -37,19 +37,21 @@ class Dragon(pygame.sprite.Sprite):
 
         self.hp_text = font.Font("fonts/PixelifySans-SemiBold.ttf", 40)
         self.hp_text = self.hp_text.render("Dragon", True, (152, 26, 26))
+        try:
+            self.hurt_sound = pygame.mixer.Sound("sounds/padenie-drakona-v-kompyuternoy-igre.mp3")
+            self.angry_shout_sound = pygame.mixer.Sound("sounds/zlobnyiy-krik-dinozavra (mp3cut.net).mp3")
+            self.breath_sound = pygame.mixer.Sound("sounds/dragon breath (mp3cut.net).mp3")
 
-        self.hurt_sound = pygame.mixer.Sound("sounds/padenie-drakona-v-kompyuternoy-igre.mp3")
-        self.angry_shout_sound = pygame.mixer.Sound("sounds/zlobnyiy-krik-dinozavra (mp3cut.net).mp3")
-        self.breath_sound = pygame.mixer.Sound("sounds/dragon breath (mp3cut.net).mp3")
-
-        self.right_walk_sprites = [pygame.image.load(f"img/Dragon_sprites/Walk{i}.png").convert_alpha()
-                                   for i in range(1, 6)]
-        self.left_walk_sprites = [pygame.transform.flip(self.right_walk_sprites[i], True, False)
-                                  for i in range(len(self.right_walk_sprites))]
-        self.right_attack_sprites = [pygame.image.load(f"img/Dragon_sprites/Attack{i}.png").convert_alpha()
-                                     for i in range(1, 5)]
-        self.left_attack_sprites = [pygame.transform.flip(self.right_attack_sprites[i], True, False)
-                                    for i in range(len(self.right_attack_sprites))]
+            self.right_walk_sprites = [pygame.image.load(f"img/Dragon_sprites/Walk{i}.png").convert_alpha()
+                                       for i in range(1, 6)]
+            self.left_walk_sprites = [pygame.transform.flip(self.right_walk_sprites[i], True, False)
+                                      for i in range(len(self.right_walk_sprites))]
+            self.right_attack_sprites = [pygame.image.load(f"img/Dragon_sprites/Attack{i}.png").convert_alpha()
+                                         for i in range(1, 5)]
+            self.left_attack_sprites = [pygame.transform.flip(self.right_attack_sprites[i], True, False)
+                                        for i in range(len(self.right_attack_sprites))]
+        except:
+            pass
         # self.right_death_sprites = [pygame.image.load(f"img/Dragon_sprites/Death{i}.png").convert_alpha() for i in
         #                              range(1, 6)]
         # self.left_attack_sprites = [pygame.transform.flip(self.right_death_sprites[i], True, False) for i in

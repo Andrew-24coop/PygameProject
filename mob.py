@@ -7,16 +7,6 @@ from random import choice, randint
 class Mob(pygame.sprite.Sprite):
     def __init__(self, player, x, y, mob):
         super().__init__()
-        self.player = player
-        self.mob = mob
-
-        if mob == "cow":
-            self.make_cow(x, y)
-        elif mob == "pig":
-            self.make_pig(x, y)
-        # else:
-        #     self.make_chicken(x, y)
-
         self.speed_x = 0
         self.speed_y = 0
 
@@ -40,9 +30,6 @@ class Mob(pygame.sprite.Sprite):
 
         self.is_showing = True
 
-        self.image = None
-        self.rect = None
-
         self.right_walk_sprites = None
         self.left_walk_sprites = None
 
@@ -57,6 +44,18 @@ class Mob(pygame.sprite.Sprite):
 
         self.death_sound = None
         self.hurt_sound = None
+        self.player = player
+        self.mob = mob
+
+        self.image = None
+        self.rect = None
+        if mob == "cow":
+            self.make_cow(x, y)
+        elif mob == "pig":
+            self.make_pig(x, y)
+        # else:
+        #     self.make_chicken(x, y)
+
 
     def make_cow(self, x, y):
         self.image = pygame.image.load("img/Mobs/Cow/cow_1.png").convert_alpha()
